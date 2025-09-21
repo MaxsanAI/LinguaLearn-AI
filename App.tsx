@@ -140,8 +140,6 @@ const App: React.FC = () => {
     const [voiceRate, setVoiceRate] = useState(1);
     const [voicePitch, setVoicePitch] = useState(1);
     
-    const isApiKeyMissing = !process.env.API_KEY;
-
     // Load data from localStorage on initial render
     useEffect(() => {
         try {
@@ -330,7 +328,6 @@ const App: React.FC = () => {
         setIsUpgradeModalOpen(false);
     };
     
-    if (isApiKeyMissing) return <ApiKeyErrorScreen message={t.apiKeyMissingError} />;
     if (view === 'login') return <LoginScreen onLogin={handleLogin} />;
 
     const ModeButton: React.FC<{ mode: 'tutor' | 'translator'; label: string; children: React.ReactNode; }> = ({ mode, label, children }) => (

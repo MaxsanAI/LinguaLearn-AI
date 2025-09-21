@@ -36,21 +36,33 @@ export const useSpeechToText = (languageCode: string) => {
     }
 
     const recognition = new SpeechRecognition();
-    recognition.continuous = false;
+    // Set continuous to true to allow for pauses during speech, providing a more natural user experience.
+    // The previous setting (false) would cut off recognition after the first pause.
+    recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = languageCode;
 
     recognition.onresult = (event) => {
       let currentInterim = '';
-      for (let i = 0; i < event.results.length; i++) {
-        currentInterim += event.results[i][0].transcript;
-      }
-      setInterimTranscript(currentInterim);
+      let currentFinal = '';
 
-      const lastResult = event.results[event.results.length - 1];
-      if (lastResult.isFinal) {
-        setFinalTranscript(currentInterim.trim());
-        setConfidence(lastResult[0].confidence);
+      // Iterate through the new results from the last firing of this event.
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          currentFinal += transcript;
+        } else {
+          currentInterim += transcript;
+        }
+      }
+      
+      // Update the interim transcript for real-time feedback.
+      setInterimTranscript(currentInterim);
+      
+      // Append the newly finalized transcript segment to the overall final transcript.
+      if (currentFinal) {
+        setFinalTranscript(prev => (prev ? prev + ' ' : '') + currentFinal.trim());
+        setConfidence(event.results[event.results.length - 1][0].confidence);
         setInterimTranscript('');
       }
     };
@@ -69,6 +81,7 @@ export const useSpeechToText = (languageCode: string) => {
 
   const startListening = useCallback(() => {
     if (recognitionRef.current && !isListening) {
+      // Reset transcripts for a new listening session.
       setInterimTranscript('');
       setFinalTranscript('');
       setConfidence(0);

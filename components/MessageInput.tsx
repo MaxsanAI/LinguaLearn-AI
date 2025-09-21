@@ -97,6 +97,10 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   const dailyMessages = isPremium 
     ? '∞' 
     : String(dailyLimit - dailyMessageCount);
+  
+  const textToShow = isListening
+    ? `${inputValue}${inputValue ? ' ' : ''}${interimTranscript}`.trim() || t.listeningAria
+    : inputValue;
 
   return (
     <div className="p-4 bg-white/80 backdrop-blur-sm border-t border-slate-200">
@@ -141,7 +145,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         </button>
         <div className="flex-1 relative">
             <textarea
-              value={isListening ? interimTranscript || t.listeningAria : inputValue}
+              value={textToShow}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               placeholder={limitReached ? t.dailyLimitReached : t.typeMessage}
