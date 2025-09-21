@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { LANGUAGES } from '../constants';
-import type { Language } from '../types';
-import { useTranslations } from '../hooks/useTranslations';
-import { useSpeechToText } from '../hooks/useSpeechToText';
-import { useTextToSpeech } from '../hooks/useTextToSpeech';
-import { translateText } from '../services/geminiService';
+import { LANGUAGES } from '../constants.ts';
+import type { Language } from '../types.ts';
+import { useTranslations } from '../hooks/useTranslations.ts';
+import { useSpeechToText } from '../hooks/useSpeechToText.ts';
+import { useTextToSpeech } from '../hooks/useTextToSpeech.ts';
+import { translateText } from '../services/geminiService.ts';
 
 const LanguageSelect: React.FC<{
     id: string;

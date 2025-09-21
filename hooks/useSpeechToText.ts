@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 
-// Fix: Define interfaces for the non-standard SpeechRecognition API to resolve TypeScript errors.
+// Define interfaces for the non-standard SpeechRecognition API to resolve TypeScript errors.
 // These interfaces provide types for the recognition instance and its constructor,
 // preventing name collisions and type errors.
 interface SpeechRecognitionInstance {

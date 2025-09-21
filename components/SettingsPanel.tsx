@@ -1,6 +1,5 @@
 import React from 'react';
-// FIX: Use relative path for useTranslations hook import
-import { useTranslations } from '../hooks/useTranslations';
+import { useTranslations } from '../hooks/useTranslations.ts';
 
 interface SettingsPanelProps {
   isSessionActive: boolean;

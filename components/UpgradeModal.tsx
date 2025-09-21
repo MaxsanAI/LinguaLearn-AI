@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useTranslations } from '../hooks/useTranslations';
+import { useTranslations } from '../hooks/useTranslations.ts';
 
 type Plan = 'monthly' | 'yearly';
 

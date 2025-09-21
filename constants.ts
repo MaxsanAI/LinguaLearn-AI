@@ -1,4 +1,4 @@
-import type { Language, Scenario } from './types';
+import type { Language, Scenario } from './types.ts';
 
 export const DAILY_MESSAGE_LIMIT = 30;
 

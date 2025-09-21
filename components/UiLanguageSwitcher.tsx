@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useTranslations } from '../hooks/useTranslations';
-import { UI_LANGUAGES, UiLanguageCode } from '../translations';
+import { useTranslations } from '../hooks/useTranslations.ts';
+import { UI_LANGUAGES, UiLanguageCode } from '../translations.ts';
 
 const ChevronDownIcon: React.FC = () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">

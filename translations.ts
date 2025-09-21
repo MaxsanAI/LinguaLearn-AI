@@ -1,5 +1,3 @@
-// FIX: Provide implementation for the translations module.
-
 const en = {
   // Language Names
   lang_en: "English",
@@ -259,7 +257,6 @@ export const translations = { en, sr, de, it, es, fr, pt, ru };
 
 export type UiLanguageCode = keyof typeof translations;
 
-// FIX: Corrected typo in type from UiLanguagee to UiLanguageCode.
 export const UI_LANGUAGES: { code: UiLanguageCode, name: string, flag: string }[] = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
     { code: 'sr', name: 'Srpski', flag: '🇷🇸' },

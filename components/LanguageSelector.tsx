@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { LANGUAGES } from '../constants';
-import type { Language } from '../types';
-// FIX: Use relative path for useTranslations hook import
-import { useTranslations } from '../hooks/useTranslations';
+import { LANGUAGES } from '../constants.ts';
+import type { Language } from '../types.ts';
+import { useTranslations } from '../hooks/useTranslations.ts';
 
 interface LanguagePairSelectorProps {
   onLanguagesSelected: (baseLanguage: Language, targetLanguage: Language) => void;

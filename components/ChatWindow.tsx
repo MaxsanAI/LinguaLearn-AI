@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
-import type { ChatMessage } from '../types';
-import { useTranslations } from '../hooks/useTranslations';
+import type { ChatMessage } from '../types.ts';
+import { useTranslations } from '../hooks/useTranslations.ts';
 
 const TypingIndicator: React.FC = () => (
   <div className="flex items-center space-x-1.5 p-3 rounded-lg">

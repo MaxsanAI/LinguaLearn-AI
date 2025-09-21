@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import type { Language, ChatMessage } from '../types';
+import type { Language, ChatMessage } from '../types.ts';
 
 // The API key check is now handled in the main App component for better user feedback.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });

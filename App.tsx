@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { LanguageSelector } from './components/LanguageSelector';
-import { ChatWindow } from './components/ChatWindow';
-import { MessageInput } from './components/MessageInput';
-import { SettingsPanel } from './components/SettingsPanel';
-import { UiLanguageSwitcher } from './components/UiLanguageSwitcher';
-import { LiveTranslator } from './components/LiveTranslator';
-import { Tutorial } from './components/Tutorial';
-import { UpgradeModal } from './components/UpgradeModal';
-import { getConversationResponse } from './services/geminiService';
-import { useSpeechToText } from './hooks/useSpeechToText';
-import { useTextToSpeech } from './hooks/useTextToSpeech';
-import { useTranslations } from './hooks/useTranslations';
-import { SCENARIOS, DAILY_MESSAGE_LIMIT } from './constants';
-import type { Language, ChatMessage, AppMode, User, Scenario, HistorySession } from './types';
+import { LanguageSelector } from './components/LanguageSelector.tsx';
+import { ChatWindow } from './components/ChatWindow.tsx';
+import { MessageInput } from './components/MessageInput.tsx';
+import { SettingsPanel } from './components/SettingsPanel.tsx';
+import { UiLanguageSwitcher } from './components/UiLanguageSwitcher.tsx';
+import { LiveTranslator } from './components/LiveTranslator.tsx';
+import { Tutorial } from './components/Tutorial.tsx';
+import { UpgradeModal } from './components/UpgradeModal.tsx';
+import { getConversationResponse } from './services/geminiService.ts';
+import { useSpeechToText } from './hooks/useSpeechToText.ts';
+import { useTextToSpeech } from './hooks/useTextToSpeech.ts';
+import { useTranslations } from './hooks/useTranslations.ts';
+import { SCENARIOS, DAILY_MESSAGE_LIMIT } from './constants.ts';
+import type { Language, ChatMessage, AppMode, User, Scenario, HistorySession } from './types.ts';
 
 // Icons for UI elements
 const SettingsIcon: React.FC = () => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"> <path fillRule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 5.85a1.5 1.5 0 0 1-1.058 1.058l-2.022.171c-.904.076-1.567.833-1.567 1.745v2.246c0 .912.663 1.669 1.567 1.745l2.022.171a1.5 1.5 0 0 1 1.058 1.058l.171 2.022c.076.904.833 1.567 1.745 1.567h2.246c.912 0 1.669-.663 1.745-1.567l.171-2.022a1.5 1.5 0 0 1 1.058-1.058l2.022-.171c.904-.076 1.567-.833 1.567-1.745v-2.246c0-.912-.663-1.669-1.567-1.745l-2.022-.171a1.5 1.5 0 0 1-1.058-1.058l-.171-2.022c-.076-.904-.833-1.567-1.745-1.567h-2.246Zm-1.63 9.75a4.125 4.125 0 1 1 8.25 0 4.125 4.125 0 0 1-8.25 0Z" clipRule="evenodd" /> </svg> );

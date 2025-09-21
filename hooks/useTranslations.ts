@@ -1,6 +1,5 @@
-// FIX: Provide implementation for the useTranslations hook.
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
-import { translations, UI_LANGUAGES, UiLanguageCode } from '../translations';
+import { translations, UI_LANGUAGES, UiLanguageCode } from '../translations.ts';
 
 type TranslationsContextType = {
   uiLanguage: UiLanguageCode;
@@ -31,8 +30,6 @@ export const TranslationsProvider: React.FC<{ children: React.ReactNode }> = ({ 
     t,
   };
 
-  // FIX: Replaced JSX with React.createElement to be compatible with the .ts file extension.
-  // The original JSX was causing syntax errors because .ts files do not support JSX.
   return React.createElement(TranslationsContext.Provider, { value }, children);
 };
 
