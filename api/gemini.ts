@@ -63,7 +63,8 @@ export default async function handler(req: any, res: any) {
                 translation: { type: Type.STRING },
             },
             required: ["response", "translation"],
-          }
+          },
+          thinkingConfig: { thinkingBudget: 0 }
         };
 
         const contents = history.length > 0
@@ -93,6 +94,7 @@ export default async function handler(req: any, res: any) {
             config: {
                 systemInstruction: systemInstruction,
                 temperature: 0.2,
+                thinkingConfig: { thinkingBudget: 0 }
             }
         });
         

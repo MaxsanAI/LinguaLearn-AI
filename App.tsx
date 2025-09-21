@@ -203,26 +203,46 @@ const App: React.FC = () => {
     useLocalStorage('lingua_gamification', { xp, streak, lastLogin: new Date().toDateString() });
 
     useEffect(() => {
-        if (voices.length > 0 && !selectedVoiceURI) {
-            const defaultVoice = voices.find(v => v.default) || voices[0];
-            setSelectedVoiceURI(defaultVoice?.voiceURI);
+        if (voices.length > 0) {
+            const currentVoiceIsValid = voices.some(v => v.voiceURI === selectedVoiceURI);
+            if (!currentVoiceIsValid) {
+                const defaultVoice = voices.find(v => v.default) || voices[0];
+                setSelectedVoiceURI(defaultVoice?.voiceURI);
+            }
         }
     }, [voices, selectedVoiceURI]);
+
+    // Effect to handle speaking new messages from the model
+    useEffect(() => {
+        const lastMessage = messages[messages.length - 1];
+
+        // Only speak in an active chat session when a new model message arrives
+        if (lastMessage?.role === 'model' && view === 'chat') {
+            const isFirstModelMessage = messages.filter(m => m.role === 'model').length === 1;
+
+            // For the first message, let the browser pick the default voice based on language
+            // to avoid race conditions with voice loading. For subsequent messages, use
+            // the user-selected voice.
+            const voiceToUse = isFirstModelMessage
+                ? null
+                : voices.find(v => v.voiceURI === selectedVoiceURI) || null;
+
+            speak(lastMessage.content.original, voiceToUse, { rate: voiceRate, pitch: voicePitch });
+        }
+    // We only want this effect to re-run when a new message is added.
+    // The other dependencies are states for configuring the speech, not for triggering it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [messages]);
     
     const handleTutorResponse = useCallback((content: { original: string; translation?: string; }) => {
         setMessages(prev => [...prev, { role: 'model', content: content }]);
-        if (view === 'chat') {
-          const selectedVoice = voices.find(v => v.voiceURI === selectedVoiceURI) || null;
-          speak(content.original, selectedVoice, { rate: voiceRate, pitch: voicePitch });
-        }
-    }, [speak, voices, selectedVoiceURI, voiceRate, voicePitch, view]);
+    }, []);
     
     const startChatSession = async (base: Language, target: Language, scenario: Scenario | null) => {
         setSession({ base, target });
         setSelectedScenario(scenario);
         setView('chat');
         setIsLoading(true);
-        setSelectedVoiceURI(null);
         setMessages([]);
         try {
             const response = await getConversationResponse([], base, target, scenario?.instruction);
