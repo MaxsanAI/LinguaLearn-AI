@@ -189,21 +189,39 @@ const App: React.FC = () => {
         }
     }, []);
 
-    // Save data to localStorage whenever it changes
-    const useLocalStorage = (key: string, value: any) => {
-        useEffect(() => {
-            try {
-                if (value !== null && ( (Array.isArray(value) && value.length > 0) || (typeof value === 'object' && Object.keys(value).length > 0))) {
-                     localStorage.setItem(key, JSON.stringify(value));
-                }
-            } catch (error) {
-                console.error(`Failed to save ${key} to localStorage`, error);
+    // Save user data to localStorage
+    useEffect(() => {
+        try {
+            if (user) {
+                localStorage.setItem('lingua_user', JSON.stringify(user));
             }
-        }, [key, value]);
-    };
-    useLocalStorage('lingua_user', user);
-    useLocalStorage('lingua_history', history);
-    useLocalStorage('lingua_gamification', { xp, streak, lastLogin: new Date().toDateString() });
+        } catch (error) {
+            console.error('Failed to save user data to localStorage:', error);
+        }
+    }, [user]);
+
+    // Save chat history to localStorage
+    useEffect(() => {
+        try {
+            // Do not overwrite existing history with an empty array on initial load
+            if (history.length > 0) {
+                localStorage.setItem('lingua_history', JSON.stringify(history));
+            }
+        } catch (error) {
+            console.error('Failed to save history to localStorage:', error);
+        }
+    }, [history]);
+
+    // Save gamification stats to localStorage
+    useEffect(() => {
+        try {
+            const gamificationData = { xp, streak, lastLogin: new Date().toDateString() };
+            localStorage.setItem('lingua_gamification', JSON.stringify(gamificationData));
+        } catch (error) {
+            console.error('Failed to save gamification data to localStorage:', error);
+        }
+    }, [xp, streak]);
+
 
     useEffect(() => {
         if (voices.length > 0) {
@@ -411,8 +429,9 @@ const App: React.FC = () => {
 
     return (
     <div className="flex flex-col h-screen font-sans bg-slate-100 text-slate-800">
-      <header className="flex items-center justify-between p-3 border-b border-slate-200 bg-white/80 backdrop-blur-sm z-10 shrink-0">
-        <div className="flex-1 flex items-center gap-2">
+      <header className="relative flex flex-wrap sm:flex-nowrap items-center justify-between p-3 border-b border-slate-200 bg-white/80 backdrop-blur-sm z-10 shrink-0">
+        {/* Left Icons */}
+        <div className="flex items-center gap-2">
             <button onClick={() => setIsTutorialOpen(true)} className="p-2 rounded-full text-slate-500 hover:bg-slate-200 transition-colors" aria-label={t.tutorial} title={t.tutorial}>
               <TutorialIcon />
             </button>
@@ -423,15 +442,8 @@ const App: React.FC = () => {
             )}
         </div>
         
-        <div className="flex-1 hidden sm:flex justify-center">
-            <div className="flex bg-slate-200/80 p-1 rounded-full">
-                <ModeButton mode="tutor" label={t.tutorMode}><TutorIcon /></ModeButton>
-                <ModeButton mode="text_translator" label={t.textTranslatorMode}><TextIcon /></ModeButton>
-                <ModeButton mode="translator" label={t.translatorMode}><TranslatorIcon /></ModeButton>
-            </div>
-        </div>
-        
-        <div className="flex-1 flex justify-end items-center gap-2 sm:gap-4">
+        {/* Right Icons */}
+        <div className="flex items-center gap-2 sm:gap-4">
             <div className="flex items-center gap-1 text-sm font-semibold text-slate-600" title={`${xp} ${t.xp_points}`}>
                {isPremium && <PremiumCrownIcon className="w-5 h-5 text-amber-500" title={t.premium_user} />}
                <XPIcon className="text-yellow-500"/> <span className="hidden sm:inline">{xp}</span>
@@ -445,6 +457,17 @@ const App: React.FC = () => {
               </button>
             )}
             <UiLanguageSwitcher />
+        </div>
+        
+        {/* Mode switcher - on a new line on mobile, absolute center on desktop */}
+        <div className="order-last sm:order-none w-full sm:w-auto mt-2 sm:mt-0 sm:absolute sm:left-1/2 sm:-translate-x-1/2">
+            <div className="flex justify-center">
+                <div className="flex bg-slate-200/80 p-1 rounded-full">
+                    <ModeButton mode="tutor" label={t.tutorMode}><TutorIcon /></ModeButton>
+                    <ModeButton mode="text_translator" label={t.textTranslatorMode}><TextIcon /></ModeButton>
+                    <ModeButton mode="translator" label={t.translatorMode}><TranslatorIcon /></ModeButton>
+                </div>
+            </div>
         </div>
       </header>
       
