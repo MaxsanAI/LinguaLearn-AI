@@ -116,7 +116,6 @@ const HistoryPanel: React.FC<{ history: HistorySession[], onSelectSession: (sess
 
 const App: React.FC = () => {
     // App State
-    // FIX: Added 'chat' to the view state type to allow for the chat view, resolving multiple TypeScript errors.
     const [view, setView] = useState<AppMode | 'login' | 'language' | 'scenario' | 'history_view' | 'chat'>('login');
     const [user, setUser] = useState<User | null>(null);
     const [session, setSession] = useState<{ base: Language; target: Language } | null>(null);
@@ -191,6 +190,7 @@ const App: React.FC = () => {
 
     // Save user data to localStorage
     useEffect(() => {
+        if (user === null && !localStorage.getItem('lingua_user')) return;
         try {
             if (user) {
                 localStorage.setItem('lingua_user', JSON.stringify(user));
@@ -202,11 +202,9 @@ const App: React.FC = () => {
 
     // Save chat history to localStorage
     useEffect(() => {
+        if (history.length === 0 && !localStorage.getItem('lingua_history')) return;
         try {
-            // Do not overwrite existing history with an empty array on initial load
-            if (history.length > 0) {
-                localStorage.setItem('lingua_history', JSON.stringify(history));
-            }
+            localStorage.setItem('lingua_history', JSON.stringify(history));
         } catch (error) {
             console.error('Failed to save history to localStorage:', error);
         }
@@ -237,21 +235,15 @@ const App: React.FC = () => {
     useEffect(() => {
         const lastMessage = messages[messages.length - 1];
 
-        // Only speak in an active chat session when a new model message arrives
         if (lastMessage?.role === 'model' && view === 'chat') {
             const isFirstModelMessage = messages.filter(m => m.role === 'model').length === 1;
 
-            // For the first message, let the browser pick the default voice based on language
-            // to avoid race conditions with voice loading. For subsequent messages, use
-            // the user-selected voice.
             const voiceToUse = isFirstModelMessage
                 ? null
                 : voices.find(v => v.voiceURI === selectedVoiceURI) || null;
 
             speak(lastMessage.content.original, voiceToUse, { rate: voiceRate, pitch: voicePitch });
         }
-    // We only want this effect to re-run when a new message is added.
-    // The other dependencies are states for configuring the speech, not for triggering it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [messages]);
     
@@ -259,7 +251,7 @@ const App: React.FC = () => {
         setMessages(prev => [...prev, { role: 'model', content: content }]);
     }, []);
     
-    const startChatSession = async (base: Language, target: Language, scenario: Scenario | null) => {
+    const startChatSession = useCallback(async (base: Language, target: Language, scenario: Scenario | null) => {
         setSession({ base, target });
         setSelectedScenario(scenario);
         setView('chat');
@@ -274,12 +266,12 @@ const App: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [handleTutorResponse, t.geminiError]);
 
-    const handleLanguagesSelected = (base: Language, target: Language) => {
+    const handleLanguagesSelected = useCallback((base: Language, target: Language) => {
         setSession({ base, target });
         setView('scenario');
-    };
+    }, []);
     
     const sendMessage = useCallback(async (text: string) => {
         if (!baseLanguage || !targetLanguage || view !== 'chat' || (!isPremium && dailyMessageCount >= DAILY_MESSAGE_LIMIT)) return;
@@ -306,7 +298,7 @@ const App: React.FC = () => {
         }
     }, [baseLanguage, targetLanguage, handleTutorResponse, t.geminiError, messages, selectedScenario, view, dailyMessageCount, isPremium]);
 
-    const endAndSaveSession = () => {
+    const endAndSaveSession = useCallback(() => {
         if (session && messages.length > 0) {
             const newHistorySession: HistorySession = {
                 id: Date.now().toString(),
@@ -324,38 +316,38 @@ const App: React.FC = () => {
         setIsLoading(false);
         setIsSettingsOpen(false);
         setView('language');
-    };
+    }, [session, messages, selectedScenario]);
     
-    const handleLogin = (name: string) => {
+    const handleLogin = useCallback((name: string) => {
         setUser({ name, premiumUntil: null });
         setView('language');
-    };
-    const handleLogout = () => {
+    }, []);
+    const handleLogout = useCallback(() => {
         localStorage.removeItem('lingua_user');
         setUser(null);
         setView('login');
         setSession(null);
         setMessages([]);
         setIsSettingsOpen(false);
-    };
+    }, []);
 
     const handleReplayAudio = useCallback((text: string) => {
         const selectedVoice = voices.find(v => v.voiceURI === selectedVoiceURI) || null;
         speak(text, selectedVoice, { rate: voiceRate, pitch: voicePitch });
     }, [speak, voices, selectedVoiceURI, voiceRate, voicePitch]);
 
-    const handleTestVoice = (voice: SpeechSynthesisVoice) => {
+    const handleTestVoice = useCallback((voice: SpeechSynthesisVoice) => {
         speak(t.voiceTestSentence, voice, { rate: voiceRate, pitch: voicePitch });
-    };
+    }, [speak, t.voiceTestSentence, voiceRate, voicePitch]);
 
-    const handleSelectHistorySession = (session: HistorySession) => {
+    const handleSelectHistorySession = useCallback((session: HistorySession) => {
         setSession({ base: session.baseLanguage, target: session.targetLanguage });
         setMessages(session.messages);
         setView('history_view');
         setIsHistoryOpen(false);
-    }
+    }, [])
 
-    const handleUpgradeSuccess = (plan: 'monthly' | 'yearly') => {
+    const handleUpgradeSuccess = useCallback((plan: 'monthly' | 'yearly') => {
         if (user) {
             const now = new Date();
             let expiryDate: Date;
@@ -367,7 +359,7 @@ const App: React.FC = () => {
             setUser({ ...user, premiumUntil: expiryDate.getTime() });
         }
         setIsUpgradeModalOpen(false);
-    };
+    }, [user]);
     
     if (view === 'login') return <LoginScreen onLogin={handleLogin} />;
 
