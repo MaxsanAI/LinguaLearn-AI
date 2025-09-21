@@ -107,7 +107,7 @@ export const LiveTranslator: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col flex-1 bg-slate-100 p-4 overflow-y-auto">
+        <div className="flex flex-col flex-1 bg-slate-100 p-2 sm:p-4 overflow-y-auto">
             <div className="w-full max-w-2xl mx-auto space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <LanguageSelect
@@ -130,7 +130,7 @@ export const LiveTranslator: React.FC = () => {
                     <button
                         onClick={handleMicClick}
                         disabled={!hasRecognitionSupport || isTranslating}
-                        className={`relative w-24 h-24 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-4
+                        className={`relative w-20 h-20 sm:w-24 sm:h-24 rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-4
                             ${isListening 
                                 ? 'bg-blue-500 text-white animate-pulse focus:ring-blue-500' 
                                 : 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500'
@@ -138,7 +138,7 @@ export const LiveTranslator: React.FC = () => {
                             ${(!hasRecognitionSupport || isTranslating) && 'opacity-50 cursor-not-allowed'}`}
                         aria-label={isListening ? t.stopListening : t.startListening}
                     >
-                        <MicIcon className="w-10 h-10 mx-auto" />
+                        <MicIcon className="w-8 h-8 sm:w-10 sm:h-10 mx-auto" />
                     </button>
                     <p className="mt-4 text-lg font-semibold text-slate-700">
                         {isListening ? t.listening : (isTranslating ? '...' : t.speakNow)}

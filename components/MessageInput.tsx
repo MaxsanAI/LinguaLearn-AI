@@ -103,7 +103,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     : inputValue;
 
   return (
-    <div className="p-4 bg-white/80 backdrop-blur-sm border-t border-slate-200">
+    <div className="p-2 sm:p-4 bg-white/80 backdrop-blur-sm border-t border-slate-200">
       <div className="text-center text-xs text-slate-500 mb-2">
           {t.messagesLeft?.replace('{count}', dailyMessages)}
       </div>

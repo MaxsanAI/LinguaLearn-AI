@@ -98,7 +98,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ messages, isLoading, onR
   }, [messages, isLoading]);
 
   return (
-    <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6">
+    <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
       <WelcomeBubble />
       <div className="flex flex-col space-y-4">
         {messages.map((msg, index) => (

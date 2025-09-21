@@ -71,7 +71,7 @@ export const LanguageSelector: React.FC<LanguagePairSelectorProps> = ({ onLangua
         <p className="mt-4 text-lg text-slate-600 max-w-2xl">{t.welcomeDescription}</p>
       </div>
       
-      <div className="w-full max-w-md p-8 space-y-6 bg-white/50 backdrop-blur-sm rounded-2xl shadow-xl">
+      <div className="w-full max-w-md p-6 sm:p-8 space-y-6 bg-white/50 backdrop-blur-sm rounded-2xl shadow-xl">
           <LanguageSelect
             id="base-language"
             label={t.iSpeak}

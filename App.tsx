@@ -38,10 +38,10 @@ const LoginScreen: React.FC<{ onLogin: (name: string) => void; }> = ({ onLogin }
     };
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-slate-100 p-4">
-            <div className="text-center mb-12">
-                <h1 className="text-5xl font-bold text-indigo-600">{t.welcomeTitle}</h1>
+            <div className="text-center mb-8 sm:mb-12">
+                <h1 className="text-4xl sm:text-5xl font-bold text-indigo-600">{t.welcomeTitle}</h1>
             </div>
-            <div className="w-full max-w-sm p-8 space-y-6 bg-white/50 backdrop-blur-sm rounded-2xl shadow-xl">
+            <div className="w-full max-w-sm p-6 sm:p-8 space-y-6 bg-white/50 backdrop-blur-sm rounded-2xl shadow-xl">
                 <h2 className="text-2xl font-bold text-center text-slate-800">{t.login_title}</h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
@@ -63,15 +63,15 @@ const ScenarioSelector: React.FC<{ onSelectScenario: (scenario: Scenario) => voi
     return (
         <div className="flex flex-col items-center justify-center flex-1 bg-slate-100 p-4">
             <div className="w-full max-w-2xl mx-auto">
-                <h2 className="text-3xl font-bold text-center text-slate-800 mb-8">{t.chooseMode}</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-800 mb-8">{t.chooseMode}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <button onClick={onSelectFreeConversation} className="p-8 bg-white/50 backdrop-blur-sm rounded-2xl shadow-xl text-center hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-                        <h3 className="text-2xl font-bold text-indigo-600">{t.freeConversation}</h3>
+                    <button onClick={onSelectFreeConversation} className="p-6 sm:p-8 bg-white/50 backdrop-blur-sm rounded-2xl shadow-xl text-center hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                        <h3 className="text-xl sm:text-2xl font-bold text-indigo-600">{t.freeConversation}</h3>
                         <p className="text-slate-600 mt-2">{t.freeConversationDesc}</p>
                     </button>
                     {SCENARIOS.map(scenario => (
-                        <button key={scenario.id} onClick={() => onSelectScenario(scenario)} className="p-8 bg-white/50 backdrop-blur-sm rounded-2xl shadow-xl text-center hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-                            <h3 className="text-2xl font-bold text-indigo-600">{translationMap[scenario.titleKey] || scenario.titleKey}</h3>
+                        <button key={scenario.id} onClick={() => onSelectScenario(scenario)} className="p-6 sm:p-8 bg-white/50 backdrop-blur-sm rounded-2xl shadow-xl text-center hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                            <h3 className="text-xl sm:text-2xl font-bold text-indigo-600">{translationMap[scenario.titleKey] || scenario.titleKey}</h3>
                             <p className="text-slate-600 mt-2">{translationMap[scenario.descriptionKey] || scenario.descriptionKey}</p>
                         </button>
                     ))}
@@ -399,7 +399,7 @@ const App: React.FC = () => {
             )}
         </div>
         
-        <div className="flex-1 flex justify-center">
+        <div className="flex-1 hidden sm:flex justify-center">
             <div className="flex bg-slate-200/80 p-1 rounded-full">
                 <ModeButton mode="tutor" label={t.tutorMode}><TutorIcon /></ModeButton>
                 <ModeButton mode="translator" label={t.translatorMode}><TranslatorIcon /></ModeButton>
