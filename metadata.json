@@ -1,0 +1,7 @@
+{
+  "name": "Personalizovani AI Tutor za Učenje Jezika",
+  "description": "Aplikacija koja korisnicima nudi personalizovanu nastavu najpopularnijih svetskih jezika. AI tutor konverzira sa korisnikom, ispravlja greške, objašnjava gramatiku i prilagođava lekcije nivou i interesovanjima korisnika.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
