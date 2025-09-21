@@ -1,8 +1,24 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import type { Language, ChatMessage } from '../types.ts';
 
-// The API key check is now handled in the main App component for better user feedback.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+let ai: GoogleGenAI | null = null;
+
+/**
+ * Lazily initializes and returns the GoogleGenAI instance.
+ * Throws an error if the API key is not available, which should be
+ * prevented by UI checks before any API call is made.
+ */
+const getAi = (): GoogleGenAI => {
+  if (!process.env.API_KEY) {
+    throw new Error("API_KEY environment variable is not set. This should be handled by the UI before any API calls are made.");
+  }
+  if (!ai) {
+    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  }
+  return ai;
+};
+
+
 const model = 'gemini-2.5-flash';
 
 const getConversationSystemInstruction = (baseLanguage: Language, targetLanguage: Language, scenarioInstruction?: string): string => `
@@ -36,6 +52,7 @@ Follow these rules:
 
 export const getConversationResponse = async (history: ChatMessage[], baseLanguage: Language, targetLanguage: Language, scenarioInstruction?: string): Promise<{ response: string; translation: string; }> => {
   try {
+    const aiInstance = getAi();
     const config = {
       systemInstruction: getConversationSystemInstruction(baseLanguage, targetLanguage, scenarioInstruction),
       temperature: 0.7,
@@ -58,7 +75,7 @@ export const getConversationResponse = async (history: ChatMessage[], baseLangua
         }))
       : [{ role: 'user', parts: [{ text: "Introduce yourself and start our lesson." }] }];
 
-    const response = await ai.models.generateContent({
+    const response = await aiInstance.models.generateContent({
       model: model,
       contents: contents,
       config: config
@@ -74,9 +91,10 @@ export const getConversationResponse = async (history: ChatMessage[], baseLangua
 
 export const translateText = async (text: string, sourceLang: Language, targetLang: Language): Promise<string> => {
     try {
+        const aiInstance = getAi();
         const systemInstruction = `You are a highly skilled translator. Translate the following text from ${sourceLang.englishName} to ${targetLang.englishName}. Provide ONLY the translated text, with no extra explanations or commentary.`;
 
-        const response = await ai.models.generateContent({
+        const response = await aiInstance.models.generateContent({
             model: model,
             contents: [{ role: 'user', parts: [{ text }] }],
             config: {
