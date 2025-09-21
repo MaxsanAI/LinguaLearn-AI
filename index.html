@@ -24,6 +24,10 @@
   .animate-fade-in-up {
     animation: fade-in-up 0.4s ease-out forwards;
   }
+  body {
+    /* Prevents pull-to-refresh on mobile, which was reloading the app during scroll */
+    overscroll-behavior-y: contain;
+  }
 </style>
 </head>
   <body class="bg-slate-100">

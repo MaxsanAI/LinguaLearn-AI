@@ -56,10 +56,10 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   const limitReached = !isPremium && dailyMessageCount >= dailyLimit;
 
   useEffect(() => {
-    if (finalTranscript) {
-      setInputValue(finalTranscript);
+    if (finalTranscript && !isLoading) {
+      onSendMessage(finalTranscript);
     }
-  }, [finalTranscript]);
+  }, [finalTranscript, onSendMessage, isLoading]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
