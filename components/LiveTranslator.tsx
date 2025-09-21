@@ -83,12 +83,14 @@ export const LiveTranslator: React.FC = () => {
                 speakTranslated(translation, voice);
             } catch (error) {
                 console.error("Translation error:", error);
-                setTranslatedText(t.geminiError);
+                const errorMessage = t.geminiError;
+                setTranslatedText(errorMessage);
+                speakOriginal(errorMessage, null); // Speak error in the user's source language
             } finally {
                 setIsTranslating(false);
             }
         }
-    }, [sourceLangCode, targetLangCode, t.geminiError, translatedVoices, speakTranslated]);
+    }, [sourceLangCode, targetLangCode, t.geminiError, translatedVoices, speakTranslated, speakOriginal]);
 
     useEffect(() => {
         if (finalTranscript) {

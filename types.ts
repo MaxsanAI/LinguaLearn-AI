@@ -19,7 +19,7 @@ export interface VoiceOption {
   gender: 'male' | 'female';
 }
 
-export type AppMode = 'tutor' | 'translator';
+export type AppMode = 'tutor' | 'translator' | 'text_translator';
 
 export interface User {
   name:string;

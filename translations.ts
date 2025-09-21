@@ -51,6 +51,7 @@ const en = {
   // App.tsx
   tutorMode: "Tutor",
   translatorMode: "Translator",
+  textTranslatorMode: "Text Translator",
   settings: "Settings",
   apiKeyMissingError: "The API_KEY environment variable is not set. Please ask the developer to configure it.",
   geminiError: "I'm sorry, I encountered an error. Please try again.",
@@ -66,6 +67,14 @@ const en = {
   listening: "Listening...",
   originalText: "Original Text",
   translatedText: "Translated Text",
+
+  // TextTranslator.tsx
+  typeToTranslate: "Type text to translate...",
+  translateButton: "Translate",
+  swapLanguages: "Swap languages",
+  copyToClipboard: "Copy to clipboard",
+  copied: "Copied!",
+  characterLimit: "{count} / {limit}",
 
   // LoginScreen.tsx
   login_title: "Welcome! Who is this?",
@@ -176,6 +185,7 @@ const sr = {
   logout: "Odjavi se",
   tutorMode: "Tutor",
   translatorMode: "Prevodilac",
+  textTranslatorMode: "Tekst Prevodilac",
   settings: "Podešavanja",
   apiKeyMissingError: "API_KEY varijabla okruženja nije postavljena. Molimo zamolite programera da je konfiguriše.",
   geminiError: "Izvinite, došlo je do greške. Molimo pokušajte ponovo.",
@@ -189,6 +199,12 @@ const sr = {
   listening: "Slušam...",
   originalText: "Originalni tekst",
   translatedText: "Prevedeni tekst",
+  typeToTranslate: "Ukucajte tekst za prevod...",
+  translateButton: "Prevedi",
+  swapLanguages: "Zameni jezike",
+  copyToClipboard: "Kopiraj",
+  copied: "Kopirano!",
+  characterLimit: "{count} / {limit}",
   login_title: "Dobrodošli! Ko se to uči?",
   your_name: "Vaše ime",
   name_placeholder: "npr. Aleksa",

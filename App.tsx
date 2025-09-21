@@ -5,6 +5,7 @@ import { MessageInput } from './components/MessageInput.tsx';
 import { SettingsPanel } from './components/SettingsPanel.tsx';
 import { UiLanguageSwitcher } from './components/UiLanguageSwitcher.tsx';
 import { LiveTranslator } from './components/LiveTranslator.tsx';
+import { TextTranslator } from './components/TextTranslator.tsx';
 import { Tutorial } from './components/Tutorial.tsx';
 import { UpgradeModal } from './components/UpgradeModal.tsx';
 import { getConversationResponse } from './services/geminiService.ts';
@@ -18,6 +19,7 @@ import type { Language, ChatMessage, AppMode, User, Scenario, HistorySession } f
 const SettingsIcon: React.FC = () => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"> <path fillRule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 5.85a1.5 1.5 0 0 1-1.058 1.058l-2.022.171c-.904.076-1.567.833-1.567 1.745v2.246c0 .912.663 1.669 1.567 1.745l2.022.171a1.5 1.5 0 0 1 1.058 1.058l.171 2.022c.076.904.833 1.567 1.745 1.567h2.246c.912 0 1.669-.663 1.745-1.567l.171-2.022a1.5 1.5 0 0 1 1.058-1.058l2.022-.171c.904-.076 1.567-.833 1.567-1.745v-2.246c0-.912-.663-1.669-1.567-1.745l-2.022-.171a1.5 1.5 0 0 1-1.058-1.058l-.171-2.022c-.076-.904-.833-1.567-1.745-1.567h-2.246Zm-1.63 9.75a4.125 4.125 0 1 1 8.25 0 4.125 4.125 0 0 1-8.25 0Z" clipRule="evenodd" /> </svg> );
 const TutorIcon: React.FC = () => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"> <path d="M12.378 1.602a.75.75 0 0 0-.756 0L3 7.225V18a2.25 2.25 0 0 0 2.25 2.25h13.5A2.25 2.25 0 0 0 21 18V7.225L12.378 1.602ZM12 15.75a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" /> </svg> );
 const TranslatorIcon: React.FC = () => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"> <path d="M12.865 3.033a.75.75 0 0 0-1.23 0L3.34 14.22a.75.75 0 0 0 .615 1.125h2.476a.75.75 0 0 1 .737.623l.635 2.855a.75.75 0 0 0 1.46-.324L10.33 13.5h3.34l1.066 4.999a.75.75 0 0 0 1.46.324l.636-2.855a.75.75 0 0 1 .736-.623h2.476a.75.75 0 0 0 .616-1.125L12.865 3.033Zm-1.54 8.217L12 6.561l.675 4.689h-1.35Z" /> <path d="M21.573 17.625a.75.75 0 0 1-1.015.31L18 16.687v2.063a.75.75 0 0 1-1.5 0V15.75a.75.75 0 0 1 .88-.743l2.573.514a.75.75 0 0 1 .62.723v1.38Z" /> </svg> );
+const TextIcon: React.FC = () => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"> <path fillRule="evenodd" d="M3.375 3C2.339 3 1.5 3.84 1.5 4.875v14.25C1.5 20.16 2.34 21 3.375 21h17.25c1.035 0 1.875-.84 1.875-1.875V4.875C22.5 3.839 21.66 3 20.625 3H3.375ZM9 8.25a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5H9Zm0 3.75a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5H9Zm0 3.75a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5H9Z" clipRule="evenodd" /> </svg> );
 const HistoryIcon: React.FC = () => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"> <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clipRule="evenodd" /> </svg> );
 const TutorialIcon: React.FC = () => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"> <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm11.378-3.917c-.89-.777-2.366-.777-3.255 0a.75.75 0 0 1-.988-1.129c1.454-1.272 3.776-1.272 5.23 0 .79.688.98 1.864.485 2.711l-.458.764c-.3.502-.635.926-.994 1.282a.75.75 0 0 0 .534 1.281h1.116a.75.75 0 0 1 0 1.5H12a.75.75 0 0 1-.75-.75v-1.123c0-.383.158-.75.432-1.012l.458-.764c.247-.413.43-.805.534-1.18.103-.374.08-.783-.058-1.129Zm-1.128 9.062a1.125 1.125 0 1 0 0-2.25 1.125 1.125 0 0 0 0 2.25Z" clipRule="evenodd" /> </svg> );
 const XPIcon: React.FC<{ className?: string }> = ({ className }) => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`w-5 h-5 ${className || ''}`}> <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clipRule="evenodd" /> </svg> );
@@ -114,7 +116,8 @@ const HistoryPanel: React.FC<{ history: HistorySession[], onSelectSession: (sess
 
 const App: React.FC = () => {
     // App State
-    const [view, setView] = useState<'login' | 'language' | 'scenario' | 'chat' | 'translator' | 'history_view'>('login');
+    // FIX: Added 'chat' to the view state type to allow for the chat view, resolving multiple TypeScript errors.
+    const [view, setView] = useState<AppMode | 'login' | 'language' | 'scenario' | 'history_view' | 'chat'>('login');
     const [user, setUser] = useState<User | null>(null);
     const [session, setSession] = useState<{ base: Language; target: Language } | null>(null);
     const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
@@ -350,9 +353,29 @@ const App: React.FC = () => {
     
     if (view === 'login') return <LoginScreen onLogin={handleLogin} />;
 
-    const ModeButton: React.FC<{ mode: 'tutor' | 'translator'; label: string; children: React.ReactNode; }> = ({ mode, label, children }) => (
-      <button onClick={() => setView(mode === 'tutor' ? 'language' : 'translator')} className={`flex items-center gap-2 px-3 py-1.5 text-sm font-semibold rounded-full transition-colors ${ (view !== 'translator' && mode === 'tutor') || (view === 'translator' && mode === 'translator') ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:bg-slate-200'}`} > {children} <span className="hidden sm:inline">{label}</span> </button>
-    );
+    const ModeButton: React.FC<{ mode: AppMode; label: string; children: React.ReactNode; }> = ({ mode, label, children }) => {
+        const isTutorModeActive = ['language', 'scenario', 'chat', 'history_view'].includes(view as string) && mode === 'tutor';
+        const isCurrentMode = view === mode;
+        const isActive = isTutorModeActive || isCurrentMode;
+
+        const handleSetView = () => {
+            if (mode === 'tutor') {
+                setView('language');
+            } else {
+                setView(mode);
+            }
+        };
+
+        return (
+            <button 
+                onClick={handleSetView} 
+                className={`flex items-center gap-2 px-3 py-1.5 text-sm font-semibold rounded-full transition-colors ${ isActive ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:bg-slate-200'}`}
+            > 
+                {children} 
+                <span className="hidden sm:inline">{label}</span> 
+            </button>
+        );
+    };
 
     const mainContent = () => {
         switch (view) {
@@ -381,6 +404,7 @@ const App: React.FC = () => {
                     </main>
                 );
             case 'translator': return <LiveTranslator />;
+            case 'text_translator': return <TextTranslator />;
             default: return <LanguageSelector onLanguagesSelected={handleLanguagesSelected} />;
         }
     };
@@ -402,6 +426,7 @@ const App: React.FC = () => {
         <div className="flex-1 hidden sm:flex justify-center">
             <div className="flex bg-slate-200/80 p-1 rounded-full">
                 <ModeButton mode="tutor" label={t.tutorMode}><TutorIcon /></ModeButton>
+                <ModeButton mode="text_translator" label={t.textTranslatorMode}><TextIcon /></ModeButton>
                 <ModeButton mode="translator" label={t.translatorMode}><TranslatorIcon /></ModeButton>
             </div>
         </div>

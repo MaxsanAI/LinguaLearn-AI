@@ -36,9 +36,9 @@ export const useSpeechToText = (languageCode: string) => {
     }
 
     const recognition = new SpeechRecognition();
-    // Set continuous to true to allow for pauses during speech, providing a more natural user experience.
-    // The previous setting (false) would cut off recognition after the first pause.
-    recognition.continuous = true;
+    // Setting continuous to false ensures recognition stops after the first pause,
+    // which provides a more predictable experience for single-command translation.
+    recognition.continuous = false;
     recognition.interimResults = true;
     recognition.lang = languageCode;
 
@@ -59,9 +59,10 @@ export const useSpeechToText = (languageCode: string) => {
       // Update the interim transcript for real-time feedback.
       setInterimTranscript(currentInterim);
       
-      // Append the newly finalized transcript segment to the overall final transcript.
+      // When a final transcript is received, replace the old one.
+      // This prevents the duplication bug seen with continuous mode.
       if (currentFinal) {
-        setFinalTranscript(prev => (prev ? prev + ' ' : '') + currentFinal.trim());
+        setFinalTranscript(currentFinal.trim());
         setConfidence(event.results[event.results.length - 1][0].confidence);
         setInterimTranscript('');
       }
