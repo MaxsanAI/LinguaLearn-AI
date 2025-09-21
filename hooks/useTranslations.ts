@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
-import { translations, UI_LANGUAGES, UiLanguageCode } from '../translations.ts';
+import { translations, UI_LANGUAGES, UiLanguageCode, TranslationSet } from '../translations.ts';
 
 type TranslationsContextType = {
   uiLanguage: UiLanguageCode;
   setUiLanguage: (lang: UiLanguageCode) => void;
-  t: typeof translations.en;
+  t: TranslationSet;
 };
 
 const TranslationsContext = createContext<TranslationsContextType | undefined>(undefined);

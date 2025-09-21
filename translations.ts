@@ -132,6 +132,8 @@ const en = {
   select_a_plan: "Select a plan to continue",
 };
 
+export type TranslationSet = typeof en;
+
 const sr = {
   ...en,
   lang_en: "Engleski",
