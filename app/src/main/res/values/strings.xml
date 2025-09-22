@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">LinguaLearn AI</string>
+
+    <!--
+     This is the Digital Asset Links JSON. It is used to verify that your app
+     is associated with your website.
+     You must:
+     1. Replace "com.lingualearn.ai.twa" with your applicationId if you change it.
+     2. Generate your app's SHA-256 certificate fingerprint and replace the placeholder below.
+     3. Host a file with this content at https://your-pwa-url.com/.well-known/assetlinks.json
+    -->
+    <string name="asset_statements" translatable="false">
+        [{
+            \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+            \"target\": {
+                \"namespace\": \"android_app\",
+                \"package_name\": \"com.lingualearn.ai.twa\",
+                \"sha256_cert_fingerprints\": [\"REPLACE_WITH_YOUR_SHA256_FINGERPRINT\"]
+            }
+        }]
+    </string>
+</resources>
