@@ -31,7 +31,8 @@ export const useSpeechToText = (
   const [finalTranscript, setFinalTranscript] = useState('');
   const [confidence, setConfidence] = useState(0);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
-  const finalTranscriptRef = useRef<string>(''); // Ref to hold the definitive final transcript
+  const finalTranscriptRef = useRef<string>('');
+  const onStopCalledRef = useRef(false); // Guard against multiple onend events
 
   useEffect(() => {
     if (!SpeechRecognition) {
@@ -40,7 +41,7 @@ export const useSpeechToText = (
     }
 
     const recognition = new SpeechRecognition();
-    recognition.continuous = true; // Use continuous mode for longer speech and better mobile support
+    recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = languageCode;
 
@@ -48,7 +49,6 @@ export const useSpeechToText = (
       let currentInterim = '';
       let currentFinal = '';
 
-      // Rebuild the final transcript from the beginning of the results list each time
       for (let i = 0; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
@@ -56,7 +56,6 @@ export const useSpeechToText = (
         }
       }
 
-      // The interim transcript is the last non-final result
       const lastResult = event.results[event.results.length - 1];
       if (lastResult && !lastResult.isFinal) {
         currentInterim = lastResult[0].transcript;
@@ -65,7 +64,7 @@ export const useSpeechToText = (
       const finalTrimmed = currentFinal.trim();
       setFinalTranscript(finalTrimmed);
       setInterimTranscript(currentInterim);
-      finalTranscriptRef.current = finalTrimmed; // Update the ref for the onStop callback
+      finalTranscriptRef.current = finalTrimmed;
 
       if (lastResult && lastResult.isFinal) {
         setConfidence(lastResult[0].confidence);
@@ -74,8 +73,11 @@ export const useSpeechToText = (
 
     recognition.onend = () => {
       setIsListening(false);
-      // When recognition ends (e.g., via stopListening), pass the final accumulated transcript
-      onStop(finalTranscriptRef.current);
+      // Guard against multiple onend events from some browsers
+      if (!onStopCalledRef.current) {
+        onStopCalledRef.current = true;
+        onStop(finalTranscriptRef.current);
+      }
     };
     
     recognition.onerror = (event) => {
@@ -84,25 +86,33 @@ export const useSpeechToText = (
     };
 
     recognitionRef.current = recognition;
-    // We include onStop in the dependency array to ensure the latest version is used in the onend callback.
+
+    // Cleanup function to stop recognition when component unmounts or language changes
+    return () => {
+      recognition.stop();
+    };
   }, [languageCode, onStop]);
 
   const startListening = useCallback(() => {
     if (recognitionRef.current && !isListening) {
-      // Reset transcripts and ref for a new listening session.
+      onStopCalledRef.current = false; // Reset guard for a new session
       setInterimTranscript('');
       setFinalTranscript('');
       finalTranscriptRef.current = '';
       setConfidence(0);
-      recognitionRef.current.start();
-      setIsListening(true);
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (error) {
+        console.error("Speech recognition could not start:", error);
+      }
     }
   }, [isListening]);
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current && isListening) {
       recognitionRef.current.stop();
-      // onend will fire automatically, which then calls the onStop callback with the final transcript.
+      // The 'onend' event will fire, which handles calling onStop.
     }
   }, [isListening]);
 
