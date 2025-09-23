@@ -13,6 +13,8 @@ interface SettingsPanelProps {
   onEndSession: () => void;
   onLogout: () => void;
   onTestVoice: (voice: SpeechSynthesisVoice) => void;
+  onShowPrivacyPolicy: () => void;
+  onShowTermsOfUse: () => void;
 }
 
 const Slider: React.FC<{
@@ -60,12 +62,14 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     onEndSession,
     onLogout,
     onTestVoice,
+    onShowPrivacyPolicy,
+    onShowTermsOfUse,
 }) => {
   const { t } = useTranslations();
   
   return (
     <div className="p-4 space-y-6">
-      {isSessionActive && (
+      {isSessionActive ? (
         <>
           <div>
             <label className="block text-sm font-medium text-slate-600 mb-2">{t.tutorVoice}</label>
@@ -129,15 +133,46 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             >
               {t.endSessionAndSave}
             </button>
-            <button
-              onClick={onLogout}
-              className="w-full text-center px-4 py-2 text-sm font-semibold rounded-lg bg-red-500/10 text-red-600 hover:bg-red-500/20 transition-colors"
-            >
-              {t.logout}
-            </button>
           </div>
         </>
-      )}
+      ) : null}
+      
+      {/* This section is always visible when settings are open */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t.tutorMode}</h3>
+        <button
+          onClick={onShowPrivacyPolicy}
+          className="w-full text-left px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-100 transition-colors"
+        >
+          {t.privacyPolicy}
+        </button>
+        <button
+          onClick={onShowTermsOfUse}
+          className="w-full text-left px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-100 transition-colors"
+        >
+          {t.termsOfUse}
+        </button>
+         <a
+          href="mailto:maxsansamurai@gmail.com?subject=LinguaLearn%20AI%20Feedback"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full text-left px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-100 transition-colors"
+        >
+          {t.sendFeedback}
+        </a>
+      </div>
+      
+      <hr className="border-slate-200" />
+      
+      <div className="space-y-3">
+        <button
+          onClick={onLogout}
+          className="w-full text-center px-4 py-2 text-sm font-semibold rounded-lg bg-red-500/10 text-red-600 hover:bg-red-500/20 transition-colors"
+        >
+          {t.logout}
+        </button>
+      </div>
+
     </div>
   );
 };

@@ -7,6 +7,8 @@ import { UiLanguageSwitcher } from './components/UiLanguageSwitcher.tsx';
 import { LiveTranslator } from './components/LiveTranslator.tsx';
 import { TextTranslator } from './components/TextTranslator.tsx';
 import { Tutorial } from './components/Tutorial.tsx';
+import { PrivacyPolicy } from './components/PrivacyPolicy.tsx';
+import { TermsOfUse } from './components/TermsOfUse.tsx';
 import { getConversationResponse } from './services/geminiService.ts';
 import { useSpeechToText } from './hooks/useSpeechToText.ts';
 import { useTextToSpeech } from './hooks/useTextToSpeech.ts';
@@ -133,6 +135,8 @@ const App: React.FC = () => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+    const [isPrivacyPolicyOpen, setIsPrivacyPolicyOpen] = useState(false);
+    const [isTermsOpen, setIsTermsOpen] = useState(false);
     const [history, setHistory] = useState<HistorySession[]>([]);
     const [xp, setXp] = useState(0);
     const [streak, setStreak] = useState(0);
@@ -145,7 +149,6 @@ const App: React.FC = () => {
 
     const { speak, voices, hasVoices } = useTextToSpeech(targetLanguage?.code || 'en');
     
-    // FIX: Moved `handleTutorResponse` and `sendMessage` up to resolve a "used before declaration" error in `handleFinishedSpeech`.
     const handleTutorResponse = useCallback((content: { original: string; translation?: string; }) => {
         setMessages(prev => [...prev, { role: 'model', content: content }]);
     }, []);
@@ -408,10 +411,15 @@ const App: React.FC = () => {
 
         const handleSetView = () => {
             if (mode === 'tutor') {
-                setView('language');
+                if(session) {
+                    setView('chat'); // Go back to chat if session exists
+                } else {
+                    setView('language');
+                }
             } else {
                 setView(mode);
             }
+            setIsSettingsOpen(false); // Close settings panel on mode change
         };
 
         return (
@@ -485,11 +493,11 @@ const App: React.FC = () => {
              <div className="flex items-center gap-1 text-sm font-semibold text-slate-600" title={`${streak} ${t.streak_days}`}>
                 <StreakIcon className="text-orange-500"/> <span className="hidden sm:inline">{streak}</span>
             </div>
-            {session && (view === 'chat' || view === 'history_view') && (
-              <button onClick={() => setIsSettingsOpen(true)} className="p-2 rounded-full text-slate-500 hover:bg-slate-200 transition-colors" aria-label={t.settings} title={t.settings}>
+            
+            <button onClick={() => setIsSettingsOpen(true)} className="p-2 rounded-full text-slate-500 hover:bg-slate-200 transition-colors" aria-label={t.settings} title={t.settings}>
                 <SettingsIcon />
-              </button>
-            )}
+            </button>
+            
             <UiLanguageSwitcher />
         </div>
         
@@ -509,17 +517,35 @@ const App: React.FC = () => {
 
       {isSettingsOpen && (
         <div className="absolute inset-0 z-20 flex justify-end bg-black/50 backdrop-blur-sm" onClick={() => setIsSettingsOpen(false)}>
-            <div className="w-full max-w-sm bg-white h-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="w-full max-w-sm bg-white h-full shadow-2xl flex flex-col" onClick={(e) => e.stopPropagation()}>
                 <header className="flex items-center justify-between p-4 border-b">
                     <h2 className="text-xl font-bold">{t.settings}</h2>
                     <button onClick={() => setIsSettingsOpen(false)} className="p-2 rounded-full hover:bg-slate-100"><CloseIcon className="w-6 h-6" /></button>
                 </header>
-                <SettingsPanel isSessionActive={!!session} voices={voices} selectedVoiceURI={selectedVoiceURI} onVoiceChange={setSelectedVoiceURI} voiceRate={voiceRate} onRateChange={setVoiceRate} voicePitch={voicePitch} onPitchChange={setVoicePitch} onEndSession={endAndSaveSession} onLogout={handleLogout} onTestVoice={handleTestVoice} />
+                <div className="flex-1 overflow-y-auto">
+                    <SettingsPanel 
+                        isSessionActive={!!session} 
+                        voices={voices} 
+                        selectedVoiceURI={selectedVoiceURI} 
+                        onVoiceChange={setSelectedVoiceURI} 
+                        voiceRate={voiceRate} 
+                        onRateChange={setVoiceRate} 
+                        voicePitch={voicePitch} 
+                        onPitchChange={setVoicePitch} 
+                        onEndSession={endAndSaveSession} 
+                        onLogout={handleLogout} 
+                        onTestVoice={handleTestVoice}
+                        onShowPrivacyPolicy={() => setIsPrivacyPolicyOpen(true)}
+                        onShowTermsOfUse={() => setIsTermsOpen(true)}
+                    />
+                </div>
             </div>
         </div>
       )}
       {isHistoryOpen && <HistoryPanel history={history} onSelectSession={handleSelectHistorySession} onClose={() => setIsHistoryOpen(false)} />}
       {isTutorialOpen && <Tutorial onClose={() => setIsTutorialOpen(false)} />}
+      {isPrivacyPolicyOpen && <PrivacyPolicy onClose={() => setIsPrivacyPolicyOpen(false)} />}
+      {isTermsOpen && <TermsOfUse onClose={() => setIsTermsOpen(false)} />}
     </div>
   );
 };
