@@ -123,24 +123,20 @@ const en = {
   tutorial_ai_delay_title: "A Note on AI Responses",
   tutorial_ai_delay_desc: "The AI tutor needs a moment to think. If a response doesn't appear immediately, please be patient. The audio for the tutor's message will play automatically once it arrives. You can replay the audio at any time by clicking the speaker icon next to the message.",
 
-  // Premium / Upgrade
-  upgrade_to_premium: "Upgrade to Premium",
-  premium_user: "Premium User",
-  premium_modal_title: "Unlock LinguaLearn Premium",
-  premium_feature_1: "Unlimited messages",
-  premium_feature_2: "Uninterrupted learning",
-  premium_feature_3: "Support the app's development",
-  payment_successful: "Payment successful! Welcome to Premium.",
-  payment_error: "Payment failed. Please try again.",
-  payment_technical_error: "Payments are currently unavailable due to a technical issue. Please try again later.",
-  premium_expires_on: "Premium access until: {date}",
-  upgrade_monthly: "Monthly",
-  upgrade_yearly: "Yearly",
+  // FIX: Add missing translation keys for UpgradeModal
+  // UpgradeModal.tsx
+  premium_modal_title: "Upgrade to Premium",
+  premium_feature_1: "Unlimited messages & conversations",
+  premium_feature_2: "Unlock all learning scenarios",
+  premium_feature_3: "Completely ad-free experience",
+  upgrade_monthly: "Monthly Plan",
+  upgrade_yearly: "Yearly Plan",
+  most_popular: "Most Popular",
   price_monthly: "€3.99 / month",
   price_yearly: "€29.99 / year",
   billed_annually: "Billed annually",
-  most_popular: "Most Popular",
-  select_a_plan: "Select a plan to continue",
+  payment_error: "Your payment could not be processed. Please check your payment details and try again.",
+  payment_technical_error: "A technical error occurred with the payment service. Please try again later.",
 };
 
 export type TranslationSet = typeof en;
@@ -246,25 +242,20 @@ const sr = {
   tutorial_voices_desc: "Glasove za tutora obezbeđuju vaš pregledač i operativni sistem, a ne sama aplikacija. To znači da kvalitet i dostupnost mogu varirati. Da biste dodali više jezika (poput ruskog), možda ćete morati da instalirate nove 'Text-to-Speech' glasovne pakete u podešavanjima sistema vašeg uređaja.",
   tutorial_ai_delay_title: "Napomena o AI Odgovorima",
   tutorial_ai_delay_desc: "AI tutoru je potrebno malo vremena da razmisli. Ako se odgovor ne pojavi odmah, molimo budite strpljivi. Zvuk za poruku tutora će se automatski reprodukovati kada stigne. Zvuk možete ponovo pustiti u bilo kom trenutku klikom na ikonu zvučnika pored poruke.",
-  
-  // Premium / Upgrade
-  upgrade_to_premium: "Postani Premium",
-  premium_user: "Premium Korisnik",
-  premium_modal_title: "Otključaj LinguaLearn Premium",
-  premium_feature_1: "Neograničen broj poruka",
-  premium_feature_2: "Učenje bez prekida",
-  premium_feature_3: "Podrška razvoju aplikacije",
-  payment_successful: "Plaćanje uspešno! Dobrodošli u Premium.",
-  payment_error: "Plaćanje nije uspelo. Molimo pokušajte ponovo.",
-  payment_technical_error: "Plaćanje trenutno nije dostupno zbog tehničkog problema. Molimo pokušajte ponovo kasnije.",
-  premium_expires_on: "Premium pristup važi do: {date}",
-  upgrade_monthly: "Mesečno",
-  upgrade_yearly: "Godišnje",
+  // FIX: Add missing translation keys for UpgradeModal
+  // UpgradeModal.tsx
+  premium_modal_title: "Nadogradite na Premium",
+  premium_feature_1: "Neograničene poruke i razgovori",
+  premium_feature_2: "Otključajte sve scenarije za učenje",
+  premium_feature_3: "Iskustvo u potpunosti bez reklama",
+  upgrade_monthly: "Mesečni plan",
+  upgrade_yearly: "Godišnji plan",
+  most_popular: "Najpopularnije",
   price_monthly: "€3.99 / mesečno",
   price_yearly: "€29.99 / godišnje",
-  billed_annually: "Naplata jednom godišnje",
-  most_popular: "Najpopularnije",
-  select_a_plan: "Izaberite plan da nastavite",
+  billed_annually: "Naplaćuje se godišnje",
+  payment_error: "Vaša uplata nije mogla biti obrađena. Molimo proverite detalje plaćanja i pokušajte ponovo.",
+  payment_technical_error: "Došlo je do tehničke greške sa servisom za plaćanje. Molimo pokušajte ponovo kasnije.",
 };
 
 const de = { ...en, lang_de: "Deutsch", welcomeTitle: "Willkommen bei LinguaLearn AI", };

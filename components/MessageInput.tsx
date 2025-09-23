@@ -11,8 +11,6 @@ interface MessageInputProps {
   hasRecognitionSupport: boolean;
   dailyMessageCount: number;
   dailyLimit: number;
-  isPremium: boolean;
-  onUpgradeClick: () => void;
   onWatchAd: () => void;
   isWatchingAd: boolean;
 }
@@ -49,15 +47,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     hasRecognitionSupport,
     dailyMessageCount,
     dailyLimit,
-    isPremium,
-    onUpgradeClick,
     onWatchAd,
     isWatchingAd,
 }) => {
   const [inputValue, setInputValue] = useState('');
   const { t } = useTranslations();
 
-  const limitReached = !isPremium && dailyMessageCount >= dailyLimit;
+  const limitReached = dailyMessageCount >= dailyLimit;
 
   // The logic for sending the message on finalTranscript is now handled by a callback in App.tsx
   // This useEffect is no longer needed and has been removed.
@@ -95,9 +91,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     ? t.micNotSupported 
     : (isListening ? t.stopListening : t.startListening);
 
-  const dailyMessages = isPremium 
-    ? '∞' 
-    : String(dailyLimit - dailyMessageCount);
+  const dailyMessages = String(dailyLimit - dailyMessageCount);
   
   const textToShow = isListening
     ? (`${finalTranscript} ${interimTranscript}`).trim() || t.listeningAria
@@ -118,21 +112,13 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       {limitReached ? (
         <div className="text-center p-2">
             <p className="text-slate-600 mb-3">{t.dailyLimitReached}</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <button 
-                    onClick={onUpgradeClick} 
-                    className="w-full sm:w-auto px-6 py-3 font-bold text-white bg-amber-500 rounded-xl shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-300 transform hover:scale-105"
-                >
-                    {t.upgrade_to_premium}
-                </button>
-                <button
-                    onClick={onWatchAd}
-                    disabled={isWatchingAd}
-                    className="w-full sm:w-auto px-6 py-3 font-bold text-white bg-indigo-600 rounded-xl shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-105 disabled:bg-indigo-400 disabled:cursor-not-allowed"
-                >
-                    {isWatchingAd ? '...' : t.watchAdForMessages}
-                </button>
-            </div>
+            <button
+                onClick={onWatchAd}
+                disabled={isWatchingAd}
+                className="w-full sm:w-auto px-6 py-3 font-bold text-white bg-indigo-600 rounded-xl shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-105 disabled:bg-indigo-400 disabled:cursor-not-allowed"
+            >
+                {isWatchingAd ? '...' : t.watchAdForMessages}
+            </button>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="relative flex items-center gap-2">

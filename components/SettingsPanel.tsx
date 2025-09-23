@@ -13,9 +13,6 @@ interface SettingsPanelProps {
   onEndSession: () => void;
   onLogout: () => void;
   onTestVoice: (voice: SpeechSynthesisVoice) => void;
-  isPremium: boolean;
-  premiumUntil: number | null;
-  onUpgradeClick: () => void;
 }
 
 const Slider: React.FC<{
@@ -63,32 +60,13 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     onEndSession,
     onLogout,
     onTestVoice,
-    isPremium,
-    premiumUntil,
-    onUpgradeClick,
 }) => {
   const { t } = useTranslations();
   
-  const expiryDate = premiumUntil ? new Date(premiumUntil).toLocaleDateString() : '';
-
   return (
     <div className="p-4 space-y-6">
       {isSessionActive && (
         <>
-          <div>
-            {!isPremium ? (
-              <button onClick={onUpgradeClick} className="w-full text-center px-4 py-3 text-md font-bold rounded-lg bg-amber-500 text-white hover:bg-amber-600 transition-colors shadow-lg mb-6">
-                  {t.upgrade_to_premium}
-              </button>
-            ) : (
-                <div className="text-center p-3 rounded-lg bg-green-100 text-green-800 font-semibold mb-6 border border-green-200">
-                    <p>{t.premium_user}</p>
-                    <p className="text-sm font-normal">{t.premium_expires_on.replace('{date}', expiryDate)}</p>
-                </div>
-            )}
-          </div>
-          <hr className="border-slate-200" />
-          
           <div>
             <label className="block text-sm font-medium text-slate-600 mb-2">{t.tutorVoice}</label>
             {voices.length > 0 ? (

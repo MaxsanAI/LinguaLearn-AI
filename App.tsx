@@ -7,7 +7,6 @@ import { UiLanguageSwitcher } from './components/UiLanguageSwitcher.tsx';
 import { LiveTranslator } from './components/LiveTranslator.tsx';
 import { TextTranslator } from './components/TextTranslator.tsx';
 import { Tutorial } from './components/Tutorial.tsx';
-import { UpgradeModal } from './components/UpgradeModal.tsx';
 import { getConversationResponse } from './services/geminiService.ts';
 import { useSpeechToText } from './hooks/useSpeechToText.ts';
 import { useTextToSpeech } from './hooks/useTextToSpeech.ts';
@@ -35,7 +34,6 @@ const TutorialIcon: React.FC = () => ( <svg xmlns="http://www.w3.org/2000/svg" v
 const XPIcon: React.FC<{ className?: string }> = ({ className }) => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`w-5 h-5 ${className || ''}`}> <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clipRule="evenodd" /> </svg> );
 const StreakIcon: React.FC<{ className?: string }> = ({ className }) => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`w-5 h-5 ${className || ''}`}> <path fillRule="evenodd" d="M12.963 2.286a.75.75 0 0 0-1.071 1.052A9.75 9.75 0 0 1 12 12.75v1.25a.75.75 0 0 0 1.5 0v-1.25a8.25 8.25 0 0 0-2.66-6.075.75.75 0 0 0-1.052-1.071 9.75 9.75 0 0 1 5.223 6.316.75.75 0 0 0 .683.425h2.82a.75.75 0 0 0 0-1.5h-2.82a8.25 8.25 0 0 0-4.42-5.276Z" clipRule="evenodd" /> <path fillRule="evenodd" d="M12 21a8.25 8.25 0 0 0 8.25-8.25.75.75 0 0 0-1.5 0A6.75 6.75 0 0 1 12 19.5a.75.75 0 0 0 0 1.5ZM12 3.75a.75.75 0 0 0 0 1.5A6.75 6.75 0 0 1 18.75 12a.75.75 0 0 0 1.5 0A8.25 8.25 0 0 0 12 3.75Z" clipRule="evenodd" /> </svg> );
 const CloseIcon: React.FC<{ className?: string }> = ({ className }) => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={className}><path fillRule="evenodd" d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" /></svg>);
-const PremiumCrownIcon: React.FC<{ className?: string; title?: string }> = ({ className, title }) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className={className}><title>{title}</title><path fillRule="evenodd" d="M15.994 4.502a.75.75 0 0 1 .098 1.05l-2.008 2.935-1.553.228.318 3.548a.75.75 0 0 1-1.495.138l-.6-6.661a.75.75 0 0 1 .523-.71l2.541-.847.76-.928a.75.75 0 0 1 1.05-.098ZM5.453 7.437l2.008-2.935a.75.75 0 0 1 1.148.098l.76.928 2.541.847a.75.75 0 0 1 .523.71l-.6 6.661a.75.75 0 1 1-1.495-.138l.318-3.548-1.553-.228-2.008-2.935a.75.75 0 0 1-.098-1.05Z" clipRule="evenodd" /></svg>);
 
 
 const ApiKeyErrorScreen: React.FC<{ message: string }> = ({ message }) => ( <div className="flex flex-col h-screen items-center justify-center p-4 bg-slate-100 text-slate-800"> <div className="w-full max-w-md text-center bg-white p-8 rounded-2xl shadow-xl"> <svg xmlns="http://www.w3.org/2000/svg" className="w-16 h-16 mx-auto text-red-500" viewBox="0 0 24 24" fill="currentColor"> <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.51 12.992a3 3 0 0 1-2.598 4.504H4.49C1.895 20.5 0 18.364 0 15.75c0-1.12.375-2.162 1.002-3.003L9.401 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" /> </svg> <h1 className="mt-4 text-2xl font-bold">Configuration Error</h1> <p className="mt-2 text-slate-600">{message}</p> </div> </div> );
@@ -135,7 +133,6 @@ const App: React.FC = () => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const [isTutorialOpen, setIsTutorialOpen] = useState(false);
-    const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
     const [history, setHistory] = useState<HistorySession[]>([]);
     const [xp, setXp] = useState(0);
     const [streak, setStreak] = useState(0);
@@ -145,7 +142,6 @@ const App: React.FC = () => {
 
     const { t } = useTranslations();
     const { baseLanguage, targetLanguage } = useMemo(() => ({ baseLanguage: session?.base, targetLanguage: session?.target }), [session]);
-    const isPremium = useMemo(() => (user?.premiumUntil ?? 0) > Date.now(), [user]);
 
     const { speak, voices, hasVoices } = useTextToSpeech(targetLanguage?.code || 'en');
     
@@ -155,7 +151,7 @@ const App: React.FC = () => {
     }, []);
 
     const sendMessage = useCallback(async (text: string) => {
-        if (!baseLanguage || !targetLanguage || view !== 'chat' || (!isPremium && dailyMessageCount >= DAILY_MESSAGE_LIMIT)) return;
+        if (!baseLanguage || !targetLanguage || view !== 'chat' || dailyMessageCount >= DAILY_MESSAGE_LIMIT) return;
 
         const userMessage: ChatMessage = { role: 'user', content: { original: text } };
         const updatedMessages = [...messages, userMessage];
@@ -166,18 +162,16 @@ const App: React.FC = () => {
             handleTutorResponse({ original: response.response, translation: response.translation });
             setXp(prev => prev + 10);
             
-            if (!isPremium) {
-                const newCount = dailyMessageCount + 1;
-                setDailyMessageCount(newCount);
-                localStorage.setItem('lingua_daily_limit', JSON.stringify({ date: new Date().toDateString(), count: newCount }));
-            }
+            const newCount = dailyMessageCount + 1;
+            setDailyMessageCount(newCount);
+            localStorage.setItem('lingua_daily_limit', JSON.stringify({ date: new Date().toDateString(), count: newCount }));
         } catch (error) {
             console.error("Error sending message:", error);
             setMessages(prev => [...prev, { role: 'model', content: { original: t.geminiError } }]);
         } finally {
             setIsLoading(false);
         }
-    }, [baseLanguage, targetLanguage, handleTutorResponse, t.geminiError, messages, selectedScenario, view, dailyMessageCount, isPremium]);
+    }, [baseLanguage, targetLanguage, handleTutorResponse, t.geminiError, messages, selectedScenario, view, dailyMessageCount]);
 
     const handleFinishedSpeech = useCallback((transcript: string) => {
         if (transcript && !isLoading) {
@@ -320,7 +314,7 @@ const App: React.FC = () => {
     
     const endAndSaveSession = useCallback(() => {
         // Show interstitial ad for non-premium users before resetting state
-        if (!isPremium && window.AndroidBridge?.showInterstitialAd) {
+        if (window.AndroidBridge?.showInterstitialAd) {
             window.AndroidBridge.showInterstitialAd();
         }
 
@@ -341,10 +335,10 @@ const App: React.FC = () => {
         setIsLoading(false);
         setIsSettingsOpen(false);
         setView('language');
-    }, [session, messages, selectedScenario, isPremium]);
+    }, [session, messages, selectedScenario]);
     
     const handleLogin = useCallback((name: string) => {
-        setUser({ name, premiumUntil: null });
+        setUser({ name });
         setView('language');
     }, []);
     const handleLogout = useCallback(() => {
@@ -371,20 +365,6 @@ const App: React.FC = () => {
         setView('history_view');
         setIsHistoryOpen(false);
     }, [])
-
-    const handleUpgradeSuccess = useCallback((plan: 'monthly' | 'yearly') => {
-        if (user) {
-            const now = new Date();
-            let expiryDate: Date;
-            if (plan === 'monthly') {
-                expiryDate = new Date(now.setMonth(now.getMonth() + 1));
-            } else {
-                expiryDate = new Date(now.setFullYear(now.getFullYear() + 1));
-            }
-            setUser({ ...user, premiumUntil: expiryDate.getTime() });
-        }
-        setIsUpgradeModalOpen(false);
-    }, [user]);
 
     const handleWatchAd = useCallback(() => {
         if (window.AndroidBridge?.showRewardedAd) {
@@ -465,8 +445,6 @@ const App: React.FC = () => {
                                 hasRecognitionSupport={hasRecognitionSupport} 
                                 dailyMessageCount={dailyMessageCount}
                                 dailyLimit={DAILY_MESSAGE_LIMIT}
-                                isPremium={isPremium}
-                                onUpgradeClick={() => setIsUpgradeModalOpen(true)}
                                 onWatchAd={handleWatchAd}
                                 isWatchingAd={isWatchingAd}
                             />
@@ -502,7 +480,6 @@ const App: React.FC = () => {
         {/* Right Icons */}
         <div className="flex items-center gap-2 sm:gap-4">
             <div className="flex items-center gap-1 text-sm font-semibold text-slate-600" title={`${xp} ${t.xp_points}`}>
-               {isPremium && <PremiumCrownIcon className="w-5 h-5 text-amber-500" title={t.premium_user} />}
                <XPIcon className="text-yellow-500"/> <span className="hidden sm:inline">{xp}</span>
             </div>
              <div className="flex items-center gap-1 text-sm font-semibold text-slate-600" title={`${streak} ${t.streak_days}`}>
@@ -537,13 +514,12 @@ const App: React.FC = () => {
                     <h2 className="text-xl font-bold">{t.settings}</h2>
                     <button onClick={() => setIsSettingsOpen(false)} className="p-2 rounded-full hover:bg-slate-100"><CloseIcon className="w-6 h-6" /></button>
                 </header>
-                <SettingsPanel isSessionActive={!!session} voices={voices} selectedVoiceURI={selectedVoiceURI} onVoiceChange={setSelectedVoiceURI} voiceRate={voiceRate} onRateChange={setVoiceRate} voicePitch={voicePitch} onPitchChange={setVoicePitch} onEndSession={endAndSaveSession} onLogout={handleLogout} onTestVoice={handleTestVoice} isPremium={isPremium} premiumUntil={user?.premiumUntil || null} onUpgradeClick={() => setIsUpgradeModalOpen(true)} />
+                <SettingsPanel isSessionActive={!!session} voices={voices} selectedVoiceURI={selectedVoiceURI} onVoiceChange={setSelectedVoiceURI} voiceRate={voiceRate} onRateChange={setVoiceRate} voicePitch={voicePitch} onPitchChange={setVoicePitch} onEndSession={endAndSaveSession} onLogout={handleLogout} onTestVoice={handleTestVoice} />
             </div>
         </div>
       )}
       {isHistoryOpen && <HistoryPanel history={history} onSelectSession={handleSelectHistorySession} onClose={() => setIsHistoryOpen(false)} />}
       {isTutorialOpen && <Tutorial onClose={() => setIsTutorialOpen(false)} />}
-      {isUpgradeModalOpen && <UpgradeModal onClose={() => setIsUpgradeModalOpen(false)} onUpgradeSuccess={handleUpgradeSuccess} />}
     </div>
   );
 };
