@@ -1,3 +1,4 @@
+
 <resources>
     <string name="app_name">LinguaLearn AI</string>
 
@@ -21,4 +22,8 @@
             }
         }]
     </string>
+    
+    <!-- AdMob Ad Unit IDs. Replace with your actual Ad Unit IDs. -->
+    <string name="admob_interstitial_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="admob_rewarded_ad_unit_id" translatable="false">ca-app-pub-3940256099942544/5224354917</string>
 </resources>

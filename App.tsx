@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { LanguageSelector } from './components/LanguageSelector.tsx';
 import { ChatWindow } from './components/ChatWindow.tsx';
@@ -143,6 +144,7 @@ const App: React.FC = () => {
     const [dailyMessageCount, setDailyMessageCount] = useState(0);
     const [isWatchingAd, setIsWatchingAd] = useState(false);
     const [adRewardMessage, setAdRewardMessage] = useState<string | null>(null);
+    const [actionCount, setActionCount] = useState(0);
 
     const { t } = useTranslations();
     const { baseLanguage, targetLanguage } = useMemo(() => ({ baseLanguage: session?.base, targetLanguage: session?.target }), [session]);
@@ -152,6 +154,18 @@ const App: React.FC = () => {
     const handleTutorResponse = useCallback((content: { original: string; translation?: string; }) => {
         setMessages(prev => [...prev, { role: 'model', content: content }]);
     }, []);
+
+    const handleAppAction = useCallback(() => {
+        const newCount = actionCount + 1;
+        setActionCount(newCount);
+        if (newCount > 0 && newCount % 3 === 0) {
+            if (window.AndroidBridge?.showInterstitialAd) {
+                window.AndroidBridge.showInterstitialAd();
+            } else {
+                console.log(`[Ad Trigger] Interstitial ad would be shown at action count: ${newCount}`);
+            }
+        }
+    }, [actionCount]);
 
     const sendMessage = useCallback(async (text: string) => {
         if (!baseLanguage || !targetLanguage || view !== 'chat' || dailyMessageCount >= DAILY_MESSAGE_LIMIT) return;
@@ -297,6 +311,7 @@ const App: React.FC = () => {
         setSession({ base, target });
         setSelectedScenario(scenario);
         setView('chat');
+        handleAppAction();
         setIsLoading(true);
         setMessages([]);
         try {
@@ -308,18 +323,16 @@ const App: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [handleTutorResponse, t.geminiError]);
+    }, [handleTutorResponse, t.geminiError, handleAppAction]);
 
     const handleLanguagesSelected = useCallback((base: Language, target: Language) => {
         setSession({ base, target });
         setView('scenario');
-    }, []);
+        handleAppAction();
+    }, [handleAppAction]);
     
     const endAndSaveSession = useCallback(() => {
-        // Show interstitial ad for non-premium users before resetting state
-        if (window.AndroidBridge?.showInterstitialAd) {
-            window.AndroidBridge.showInterstitialAd();
-        }
+        handleAppAction();
 
         if (session && messages.length > 0) {
             const newHistorySession: HistorySession = {
@@ -338,7 +351,7 @@ const App: React.FC = () => {
         setIsLoading(false);
         setIsSettingsOpen(false);
         setView('language');
-    }, [session, messages, selectedScenario]);
+    }, [session, messages, selectedScenario, handleAppAction]);
     
     const handleLogin = useCallback((name: string) => {
         setUser({ name });
@@ -366,8 +379,9 @@ const App: React.FC = () => {
         setSession({ base: session.baseLanguage, target: session.targetLanguage });
         setMessages(session.messages);
         setView('history_view');
+        handleAppAction();
         setIsHistoryOpen(false);
-    }, [])
+    }, [handleAppAction])
 
     const handleWatchAd = useCallback(() => {
         if (window.AndroidBridge?.showRewardedAd) {
@@ -410,6 +424,10 @@ const App: React.FC = () => {
         const isActive = isTutorModeActive || isCurrentMode;
 
         const handleSetView = () => {
+            if (!isActive) {
+                handleAppAction();
+            }
+
             if (mode === 'tutor') {
                 if(session) {
                     setView('chat'); // Go back to chat if session exists
