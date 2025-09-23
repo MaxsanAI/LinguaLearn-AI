@@ -13,6 +13,8 @@ interface MessageInputProps {
   dailyLimit: number;
   isPremium: boolean;
   onUpgradeClick: () => void;
+  onWatchAd: () => void;
+  isWatchingAd: boolean;
 }
 
 const SendIcon: React.FC<{className?: string}> = ({ className }) => (
@@ -49,17 +51,16 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     dailyLimit,
     isPremium,
     onUpgradeClick,
+    onWatchAd,
+    isWatchingAd,
 }) => {
   const [inputValue, setInputValue] = useState('');
   const { t } = useTranslations();
 
   const limitReached = !isPremium && dailyMessageCount >= dailyLimit;
 
-  useEffect(() => {
-    if (finalTranscript && !isLoading) {
-      onSendMessage(finalTranscript);
-    }
-  }, [finalTranscript, onSendMessage, isLoading]);
+  // The logic for sending the message on finalTranscript is now handled by a callback in App.tsx
+  // This useEffect is no longer needed and has been removed.
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,8 +100,15 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     : String(dailyLimit - dailyMessageCount);
   
   const textToShow = isListening
-    ? `${inputValue}${inputValue ? ' ' : ''}${interimTranscript}`.trim() || t.listeningAria
+    ? (`${finalTranscript} ${interimTranscript}`).trim() || t.listeningAria
     : inputValue;
+
+    useEffect(() => {
+        if (isListening) {
+          // Keep the input value in sync with the speech recognition transcript
+          setInputValue(textToShow);
+        }
+    }, [isListening, textToShow]);
 
   return (
     <div className="p-2 sm:p-4 bg-white/80 backdrop-blur-sm border-t border-slate-200">
@@ -110,59 +118,46 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       {limitReached ? (
         <div className="text-center p-2">
             <p className="text-slate-600 mb-3">{t.dailyLimitReached}</p>
-            <button 
-                onClick={onUpgradeClick} 
-                className="px-6 py-3 font-bold text-white bg-amber-500 rounded-xl shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-300"
-            >
-                {t.upgrade_to_premium}
-            </button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button 
+                    onClick={onUpgradeClick} 
+                    className="w-full sm:w-auto px-6 py-3 font-bold text-white bg-amber-500 rounded-xl shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-300 transform hover:scale-105"
+                >
+                    {t.upgrade_to_premium}
+                </button>
+                <button
+                    onClick={onWatchAd}
+                    disabled={isWatchingAd}
+                    className="w-full sm:w-auto px-6 py-3 font-bold text-white bg-indigo-600 rounded-xl shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-105 disabled:bg-indigo-400 disabled:cursor-not-allowed"
+                >
+                    {isWatchingAd ? '...' : t.watchAdForMessages}
+                </button>
+            </div>
         </div>
       ) : (
-      <form onSubmit={handleSubmit} className="flex items-center space-x-2 md:space-x-4 max-w-4xl mx-auto">
-        <button
-          type="button"
-          onClick={handleSuggestion}
-          disabled={isLoading || isListening || limitReached}
-          className="p-3 rounded-full text-slate-500 hover:bg-slate-200 focus:ring-indigo-500 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label={t.suggestionAria}
-          title={t.suggestionAria}
-        >
-          <SuggestionIcon className="w-6 h-6" />
-        </button>
-        <button
-          type="button"
-          onClick={onMicClick}
-          disabled={isLoading || !hasRecognitionSupport || limitReached}
-          className={`p-3 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-              isListening 
-              ? 'bg-blue-500 text-white animate-pulse focus:ring-blue-500' 
-              : 'text-slate-500 hover:bg-slate-200 focus:ring-indigo-500'
-          } ${(!hasRecognitionSupport || limitReached) && 'opacity-50 cursor-not-allowed'}`}
-          aria-label={isListening ? t.listeningAria : micTitle}
-          title={micTitle}
-        >
-          <MicIcon className="w-6 h-6" />
-        </button>
-        <div className="flex-1 relative">
+        <form onSubmit={handleSubmit} className="relative flex items-center gap-2">
+          <button type="button" onClick={handleSuggestion} className="p-3 text-slate-500 hover:text-indigo-600 hover:bg-slate-200 rounded-full transition-colors" aria-label={t.suggestionAria} title={t.suggestionAria}>
+              <SuggestionIcon className="w-6 h-6" />
+          </button>
+          <div className="flex-1 relative">
             <textarea
               value={textToShow}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder={limitReached ? t.dailyLimitReached : t.typeMessage}
+              placeholder={t.typeMessage}
               rows={1}
-              className="w-full p-3 bg-slate-100 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 placeholder-slate-500"
-              disabled={isLoading || isListening || limitReached}
+              className="w-full py-3 pl-4 pr-12 bg-white border border-slate-300 rounded-2xl shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow duration-200 max-h-32"
+              disabled={isLoading || isListening}
+              aria-label={t.typeMessage}
             />
-        </div>
-        <button
-          type="submit"
-          disabled={isLoading || !inputValue.trim() || limitReached}
-          className="p-3 rounded-full bg-indigo-500 text-white disabled:bg-indigo-300 disabled:cursor-not-allowed hover:bg-indigo-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          aria-label={t.sendAria}
-        >
-          <SendIcon className="w-6 h-6" />
-        </button>
-      </form>
+            <button type="button" onClick={onMicClick} disabled={!hasRecognitionSupport || isLoading} className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full transition-colors ${isListening ? 'text-blue-500 bg-blue-100 animate-pulse' : 'text-slate-500 hover:bg-slate-200'} disabled:opacity-50 disabled:cursor-not-allowed`} title={micTitle} aria-label={micTitle}>
+              <MicIcon className="w-6 h-6" />
+            </button>
+          </div>
+          <button type="submit" disabled={!inputValue.trim() || isLoading} className="p-3 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition-colors disabled:bg-indigo-400 disabled:cursor-not-allowed" aria-label={t.sendAria}>
+            <SendIcon className="w-6 h-6" />
+          </button>
+        </form>
       )}
     </div>
   );

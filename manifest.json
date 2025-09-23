@@ -1,0 +1,27 @@
+{
+  "short_name": "LinguaLearn",
+  "name": "LinguaLearn AI: Language Tutor",
+  "description": "An application that offers users personalized lessons for the world's most popular languages. The AI tutor converses with the user, corrects mistakes, explains grammar, and adapts lessons to the user's level and interests.",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#4f46e5",
+  "background_color": "#f1f5f9"
+}

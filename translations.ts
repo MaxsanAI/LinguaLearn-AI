@@ -59,6 +59,8 @@ const en = {
   xp_points: "XP Points",
   streak_days: "Day Streak",
   dailyLimitReached: "You have reached your daily message limit.",
+  watchAdForMessages: "Watch Ad for +5 Messages",
+  rewardGranted: "You've received +5 messages!",
 
   // LiveTranslator.tsx
   iAmSpeaking: "I am speaking...",
@@ -66,7 +68,7 @@ const en = {
   speakNow: "Speak Now",
   listening: "Listening...",
   originalText: "Original Text",
-  translatedText: "Translated Text",
+  translatedText: "TranslatedText",
 
   // TextTranslator.tsx
   typeToTranslate: "Type text to translate...",
@@ -193,6 +195,8 @@ const sr = {
   xp_points: "XP poena",
   streak_days: "Dana u nizu",
   dailyLimitReached: "Dostigli ste dnevni limit za poruke.",
+  watchAdForMessages: "Pogledaj reklamu za +5 poruka",
+  rewardGranted: "Dobili ste +5 poruka!",
   iAmSpeaking: "Govorim...",
   translateTo: "Prevedi na...",
   speakNow: "Govorite sada",

@@ -15,6 +15,16 @@ import { useTranslations } from './hooks/useTranslations.ts';
 import { SCENARIOS, DAILY_MESSAGE_LIMIT } from './constants.ts';
 import type { Language, ChatMessage, AppMode, User, Scenario, HistorySession } from './types.ts';
 
+declare global {
+    interface Window {
+        AndroidBridge?: {
+            showRewardedAd: () => void;
+            showInterstitialAd: () => void;
+        };
+        onRewardedAdCompleted: () => void;
+    }
+}
+
 // Icons for UI elements
 const SettingsIcon: React.FC = () => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"> <path fillRule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 5.85a1.5 1.5 0 0 1-1.058 1.058l-2.022.171c-.904.076-1.567.833-1.567 1.745v2.246c0 .912.663 1.669 1.567 1.745l2.022.171a1.5 1.5 0 0 1 1.058 1.058l.171 2.022c.076.904.833 1.567 1.745 1.567h2.246c.912 0 1.669-.663 1.745-1.567l.171-2.022a1.5 1.5 0 0 1 1.058-1.058l2.022-.171c.904-.076 1.567-.833 1.567-1.745v-2.246c0-.912-.663-1.669-1.567-1.745l-2.022-.171a1.5 1.5 0 0 1-1.058-1.058l-.171-2.022c-.076-.904-.833-1.567-1.745-1.567h-2.246Zm-1.63 9.75a4.125 4.125 0 1 1 8.25 0 4.125 4.125 0 0 1-8.25 0Z" clipRule="evenodd" /> </svg> );
 const TutorIcon: React.FC = () => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"> <path d="M12.378 1.602a.75.75 0 0 0-.756 0L3 7.225V18a2.25 2.25 0 0 0 2.25 2.25h13.5A2.25 2.25 0 0 0 21 18V7.225L12.378 1.602ZM12 15.75a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z" /> </svg> );
@@ -130,13 +140,52 @@ const App: React.FC = () => {
     const [xp, setXp] = useState(0);
     const [streak, setStreak] = useState(0);
     const [dailyMessageCount, setDailyMessageCount] = useState(0);
+    const [isWatchingAd, setIsWatchingAd] = useState(false);
+    const [adRewardMessage, setAdRewardMessage] = useState<string | null>(null);
 
     const { t } = useTranslations();
     const { baseLanguage, targetLanguage } = useMemo(() => ({ baseLanguage: session?.base, targetLanguage: session?.target }), [session]);
     const isPremium = useMemo(() => (user?.premiumUntil ?? 0) > Date.now(), [user]);
 
     const { speak, voices, hasVoices } = useTextToSpeech(targetLanguage?.code || 'en');
-    const { isListening, interimTranscript, finalTranscript, startListening, stopListening, hasRecognitionSupport } = useSpeechToText(baseLanguage?.code || 'en');
+    
+    // FIX: Moved `handleTutorResponse` and `sendMessage` up to resolve a "used before declaration" error in `handleFinishedSpeech`.
+    const handleTutorResponse = useCallback((content: { original: string; translation?: string; }) => {
+        setMessages(prev => [...prev, { role: 'model', content: content }]);
+    }, []);
+
+    const sendMessage = useCallback(async (text: string) => {
+        if (!baseLanguage || !targetLanguage || view !== 'chat' || (!isPremium && dailyMessageCount >= DAILY_MESSAGE_LIMIT)) return;
+
+        const userMessage: ChatMessage = { role: 'user', content: { original: text } };
+        const updatedMessages = [...messages, userMessage];
+        setMessages(updatedMessages);
+        setIsLoading(true);
+        try {
+            const response = await getConversationResponse(updatedMessages, baseLanguage, targetLanguage, selectedScenario?.instruction);
+            handleTutorResponse({ original: response.response, translation: response.translation });
+            setXp(prev => prev + 10);
+            
+            if (!isPremium) {
+                const newCount = dailyMessageCount + 1;
+                setDailyMessageCount(newCount);
+                localStorage.setItem('lingua_daily_limit', JSON.stringify({ date: new Date().toDateString(), count: newCount }));
+            }
+        } catch (error) {
+            console.error("Error sending message:", error);
+            setMessages(prev => [...prev, { role: 'model', content: { original: t.geminiError } }]);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [baseLanguage, targetLanguage, handleTutorResponse, t.geminiError, messages, selectedScenario, view, dailyMessageCount, isPremium]);
+
+    const handleFinishedSpeech = useCallback((transcript: string) => {
+        if (transcript && !isLoading) {
+            sendMessage(transcript);
+        }
+    }, [isLoading, sendMessage]);
+    
+    const { isListening, interimTranscript, finalTranscript, startListening, stopListening, hasRecognitionSupport } = useSpeechToText(baseLanguage?.code || 'en', handleFinishedSpeech);
     
     const [selectedVoiceURI, setSelectedVoiceURI] = useState<string | null>(null);
     const [voiceRate, setVoiceRate] = useState(1);
@@ -247,10 +296,6 @@ const App: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [messages]);
     
-    const handleTutorResponse = useCallback((content: { original: string; translation?: string; }) => {
-        setMessages(prev => [...prev, { role: 'model', content: content }]);
-    }, []);
-    
     const startChatSession = useCallback(async (base: Language, target: Language, scenario: Scenario | null) => {
         setSession({ base, target });
         setSelectedScenario(scenario);
@@ -273,32 +318,12 @@ const App: React.FC = () => {
         setView('scenario');
     }, []);
     
-    const sendMessage = useCallback(async (text: string) => {
-        if (!baseLanguage || !targetLanguage || view !== 'chat' || (!isPremium && dailyMessageCount >= DAILY_MESSAGE_LIMIT)) return;
-
-        const userMessage: ChatMessage = { role: 'user', content: { original: text } };
-        const updatedMessages = [...messages, userMessage];
-        setMessages(updatedMessages);
-        setIsLoading(true);
-        try {
-            const response = await getConversationResponse(updatedMessages, baseLanguage, targetLanguage, selectedScenario?.instruction);
-            handleTutorResponse({ original: response.response, translation: response.translation });
-            setXp(prev => prev + 10);
-            
-            if (!isPremium) {
-                const newCount = dailyMessageCount + 1;
-                setDailyMessageCount(newCount);
-                localStorage.setItem('lingua_daily_limit', JSON.stringify({ date: new Date().toDateString(), count: newCount }));
-            }
-        } catch (error) {
-            console.error("Error sending message:", error);
-            setMessages(prev => [...prev, { role: 'model', content: { original: t.geminiError } }]);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [baseLanguage, targetLanguage, handleTutorResponse, t.geminiError, messages, selectedScenario, view, dailyMessageCount, isPremium]);
-
     const endAndSaveSession = useCallback(() => {
+        // Show interstitial ad for non-premium users before resetting state
+        if (!isPremium && window.AndroidBridge?.showInterstitialAd) {
+            window.AndroidBridge.showInterstitialAd();
+        }
+
         if (session && messages.length > 0) {
             const newHistorySession: HistorySession = {
                 id: Date.now().toString(),
@@ -316,7 +341,7 @@ const App: React.FC = () => {
         setIsLoading(false);
         setIsSettingsOpen(false);
         setView('language');
-    }, [session, messages, selectedScenario]);
+    }, [session, messages, selectedScenario, isPremium]);
     
     const handleLogin = useCallback((name: string) => {
         setUser({ name, premiumUntil: null });
@@ -360,6 +385,39 @@ const App: React.FC = () => {
         }
         setIsUpgradeModalOpen(false);
     }, [user]);
+
+    const handleWatchAd = useCallback(() => {
+        if (window.AndroidBridge?.showRewardedAd) {
+            setIsWatchingAd(true);
+            window.AndroidBridge.showRewardedAd();
+        } else {
+            console.warn("Android Ad Bridge not found. Bypassing for web testing.");
+             // Fallback for web testing - grant reward immediately
+            const newCount = Math.max(0, dailyMessageCount - 5);
+            setDailyMessageCount(newCount);
+            localStorage.setItem('lingua_daily_limit', JSON.stringify({ date: new Date().toDateString(), count: newCount }));
+            setAdRewardMessage(t.rewardGranted);
+            setTimeout(() => setAdRewardMessage(null), 3000);
+        }
+    }, [dailyMessageCount, t.rewardGranted]);
+
+    useEffect(() => {
+        // This function will be called from the native Android code after a rewarded ad is successfully watched.
+        window.onRewardedAdCompleted = () => {
+            const newCount = Math.max(0, dailyMessageCount - 5); // Grant 5 messages by reducing the count
+            setDailyMessageCount(newCount);
+            localStorage.setItem('lingua_daily_limit', JSON.stringify({ date: new Date().toDateString(), count: newCount }));
+            
+            setIsWatchingAd(false);
+            setAdRewardMessage(t.rewardGranted);
+            setTimeout(() => setAdRewardMessage(null), 3000); // Show a confirmation message
+        };
+
+        return () => { // Cleanup on component unmount
+            // @ts-ignore
+            delete window.onRewardedAdCompleted;
+        };
+    }, [dailyMessageCount, t.rewardGranted]);
     
     if (view === 'login') return <LoginScreen onLogin={handleLogin} />;
 
@@ -409,6 +467,8 @@ const App: React.FC = () => {
                                 dailyLimit={DAILY_MESSAGE_LIMIT}
                                 isPremium={isPremium}
                                 onUpgradeClick={() => setIsUpgradeModalOpen(true)}
+                                onWatchAd={handleWatchAd}
+                                isWatchingAd={isWatchingAd}
                             />
                         }
                     </main>
@@ -421,6 +481,11 @@ const App: React.FC = () => {
 
     return (
     <div className="flex flex-col h-screen font-sans bg-slate-100 text-slate-800">
+      {adRewardMessage && (
+          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-up">
+              {adRewardMessage}
+          </div>
+      )}
       <header className="relative flex flex-wrap sm:flex-nowrap items-center justify-between p-3 border-b border-slate-200 bg-white/80 backdrop-blur-sm z-10 shrink-0">
         {/* Left Icons */}
         <div className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { LANGUAGES } from '../constants.ts';
 import type { Language } from '../types.ts';
 import { useTranslations } from '../hooks/useTranslations.ts';
@@ -53,7 +53,6 @@ export const LiveTranslator: React.FC = () => {
     const [translatedText, setTranslatedText] = useState('');
     const [isTranslating, setIsTranslating] = useState(false);
 
-    const { isListening, finalTranscript, startListening, stopListening, hasRecognitionSupport } = useSpeechToText(sourceLangCode);
     const { speak: speakTranslated, voices: translatedVoices } = useTextToSpeech(targetLangCode);
     const { speak: speakOriginal } = useTextToSpeech(sourceLangCode);
 
@@ -66,7 +65,7 @@ export const LiveTranslator: React.FC = () => {
     }, [t]);
 
     const handleTranslate = useCallback(async (textToTranslate: string) => {
-        if (!textToTranslate) return;
+        if (!textToTranslate.trim()) return;
 
         setIsTranslating(true);
         setTranslatedText('');
@@ -91,12 +90,8 @@ export const LiveTranslator: React.FC = () => {
             }
         }
     }, [sourceLangCode, targetLangCode, t.geminiError, translatedVoices, speakTranslated, speakOriginal]);
-
-    useEffect(() => {
-        if (finalTranscript) {
-            handleTranslate(finalTranscript);
-        }
-    }, [finalTranscript, handleTranslate]);
+    
+    const { isListening, interimTranscript, finalTranscript, startListening, stopListening, hasRecognitionSupport } = useSpeechToText(sourceLangCode, handleTranslate);
 
     const handleMicClick = () => {
         if (isListening) {
@@ -107,6 +102,13 @@ export const LiveTranslator: React.FC = () => {
             startListening();
         }
     };
+
+    const textToDisplay = isListening ? (
+      <>
+        {finalTranscript}
+        <span className="text-slate-500 ml-1">{interimTranscript}</span>
+      </>
+    ) : recognizedText;
 
     return (
         <div className="flex flex-col flex-1 bg-slate-100 p-2 sm:p-4 overflow-y-auto">
@@ -147,18 +149,18 @@ export const LiveTranslator: React.FC = () => {
                     </p>
                 </div>
 
-                {(recognizedText || translatedText || isTranslating) && (
+                {(recognizedText || translatedText || isTranslating || isListening) && (
                     <div className="space-y-4">
                         <div className="p-6 bg-white rounded-2xl shadow-lg">
                             <h3 className="text-sm font-semibold text-slate-500 mb-2 flex justify-between items-center">
                                 <span>{t.originalText}</span>
-                                {recognizedText && !isTranslating && (
+                                {recognizedText && !isTranslating && !isListening && (
                                     <button onClick={() => speakOriginal(recognizedText, null)} className="p-2 rounded-full text-slate-400 hover:bg-slate-200 transition-colors" title={t.replayAudio}>
                                         <SpeakerIcon className="w-5 h-5" />
                                     </button>
                                 )}
                             </h3>
-                            <p className="text-lg text-slate-800 min-h-[28px]">{recognizedText}</p>
+                            <p className="text-lg text-slate-800 min-h-[28px]">{textToDisplay}</p>
                         </div>
                         <div className="p-6 bg-white rounded-2xl shadow-lg">
                             <h3 className="text-sm font-semibold text-slate-500 mb-2 flex justify-between items-center">
