@@ -37,14 +37,14 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <!-- Replace this with your PWA's URL -->
-                <data android:scheme="https" android:host="your-pwa-url.com"/>
+                <!-- This URL must match your live PWA's domain -->
+                <data android:scheme="https" android:host="lingua-learn-ai.vercel.app"/>
             </intent-filter>
             
              <!-- This meta-data tag is required to specify the default URL for the TWA -->
             <meta-data
                 android:name="android.support.customtabs.trusted.DEFAULT_URL"
-                android:value="https://your-pwa-url.com" />
+                android:value="https://lingua-learn-ai.vercel.app" />
             
             <!-- This meta-data tag is required to specify the status bar color for the TWA -->
             <meta-data

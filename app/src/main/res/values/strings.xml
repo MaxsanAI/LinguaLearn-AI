@@ -6,8 +6,10 @@
      is associated with your website.
      You must:
      1. Replace "com.lingualearn.ai.twa" with your applicationId if you change it.
-     2. Generate your app's SHA-256 certificate fingerprint and replace the placeholder below.
-     3. Host a file with this content at https://your-pwa-url.com/.well-known/assetlinks.json
+     2. Generate your app's SHA-256 certificate fingerprint in Android Studio and
+        replace "REPLACE_WITH_YOUR_SHA256_FINGERPRINT" below.
+     3. Host a file with this exact content at:
+        https://lingua-learn-ai.vercel.app/.well-known/assetlinks.json
     -->
     <string name="asset_statements" translatable="false">
         [{
